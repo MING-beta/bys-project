@@ -2,7 +2,9 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <title>변연시 — 변우석 연애 시뮬레이션</title>
 
   <!-- Google Fonts (Noto Sans KR) & Pretendard 웹폰트 -->
@@ -71,6 +73,12 @@
       color: var(--text-main);
       background: var(--bg-outer);
       overflow: hidden;
+      overscroll-behavior: none;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    button, input, textarea, select {
+      touch-action: manipulation;
     }
 
     body {
@@ -95,16 +103,50 @@
     }
 
     @media (max-width: 520px) {
+      html, body {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: var(--app-height, 100dvh);
+        background: var(--bg-cream);
+      }
       body {
         padding: 0;
-        background: var(--bg-cream);
+        align-items: stretch;
+        justify-content: flex-start;
       }
       .phone-frame {
         max-width: 100%;
-        height: 100dvh;
+        width: 100%;
+        height: var(--app-height, 100dvh);
         border-radius: 0;
         border: none;
         box-shadow: none;
+      }
+      .app-topbar {
+        padding-top: max(10px, env(safe-area-inset-top));
+        padding-left: max(12px, env(safe-area-inset-left));
+        padding-right: max(12px, env(safe-area-inset-right));
+      }
+      .bottom-nav {
+        padding-left: max(10px, env(safe-area-inset-left));
+        padding-right: max(10px, env(safe-area-inset-right));
+      }
+      .composer-shell {
+        padding-left: max(11px, env(safe-area-inset-left));
+        padding-right: max(11px, env(safe-area-inset-right));
+      }
+      body.keyboard-open .composer-shell {
+        padding-bottom: 8px;
+      }
+      /* iPhone Safari 입력창 포커스 시 자동 확대 방지 (16px 이상 필수) */
+      .chat-text-input,
+      .text-field,
+      .select-field {
+        font-size: 16px;
+      }
+      .modal-backdrop {
+        padding: max(14px, env(safe-area-inset-top)) 14px max(14px, env(safe-area-inset-bottom));
       }
     }
 
@@ -952,6 +994,9 @@
     .chat-messages {
       flex: 1;
       overflow-y: auto;
+      overflow-x: hidden;
+      overscroll-behavior-y: contain;
+      -webkit-overflow-scrolling: touch;
       padding: 14px 12px 16px;
       display: flex;
       flex-direction: column;
@@ -971,6 +1016,8 @@
       color: var(--rose-dark);
       font-size: 10.8px;
       font-weight: 800;
+      max-width: 95%;
+      text-align: center;
     }
 
     .msg-narration {
@@ -986,7 +1033,8 @@
       font-style: italic;
       line-height: 1.56;
       text-align: center;
-      word-break: keep-all;
+      word-break: break-word;
+      overflow-wrap: anywhere;
       animation: fadeSlideIn 0.28s ease forwards;
     }
 
@@ -994,7 +1042,9 @@
       display: flex;
       align-items: flex-end;
       gap: 7px;
+      width: 100%;
       max-width: 100%;
+      min-width: 0;
       animation: fadeSlideIn 0.26s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     }
 
@@ -1020,7 +1070,17 @@
     .msg-content-col {
       display: flex;
       flex-direction: column;
-      max-width: 82%;
+      min-width: 0;
+      max-width: calc(100% - 44px);
+    }
+
+    .msg-row.char .msg-content-col {
+      align-items: flex-start;
+    }
+
+    .msg-row.user .msg-content-col {
+      max-width: 84%;
+      align-items: flex-end;
     }
 
     .msg-sender-name {
@@ -1035,6 +1095,8 @@
       display: flex;
       align-items: flex-end;
       gap: 6px;
+      max-width: 100%;
+      min-width: 0;
     }
 
     .msg-row.user .bubble-line {
@@ -1042,11 +1104,15 @@
     }
 
     .bubble {
+      flex: 0 1 auto;
+      min-width: 0;
+      max-width: 100%;
       padding: 10px 13px;
       font-size: 13.7px;
       line-height: 1.52;
-      word-break: keep-all;
+      word-break: break-word;
       overflow-wrap: break-word;
+      overflow-wrap: anywhere;
       white-space: pre-wrap;
       box-shadow: 0 2px 7px rgba(58, 43, 46, 0.05);
     }
@@ -1716,15 +1782,15 @@
       color: #FFFFFF;
     }
 
-    /* 자유 입력창 */
+    /* 자유 입력창 (자동 줄바꿈 textarea 지원) */
     .input-row {
       display: flex;
-      align-items: center;
+      align-items: flex-end;
       gap: 7px;
       background: #FAF1EE;
       border: 1.5px solid rgba(232, 141, 150, 0.3);
       border-radius: 22px;
-      padding: 4px 5px 4px 14px;
+      padding: 5px 5px 5px 14px;
       transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
     }
 
@@ -1743,11 +1809,19 @@
       border: none;
       background: transparent;
       font-family: inherit;
-      font-size: 13.5px;
+      font-size: 13.8px;
+      line-height: 1.42;
       color: var(--text-main);
       outline: none;
       min-width: 0;
-      padding: 6px 0;
+      padding: 7px 0;
+      resize: none;
+      overflow-y: auto;
+      max-height: 96px;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+      -webkit-appearance: none;
+      appearance: none;
     }
 
     .chat-text-input::placeholder {
@@ -2682,6 +2756,77 @@
       color: var(--text-muted);
       line-height: 1.45;
     }
+
+    /* ==========================================================================
+       12. iPhone 소형 화면(SE/mini 375px) & iOS 모달/미디어 카드 반응형 보정
+       ========================================================================== */
+    .modal-card {
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+    }
+
+    .text-field, .select-field {
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .photo-card-bubble {
+      width: min(222px, 100%);
+    }
+
+    .shorts-card-bubble {
+      width: min(192px, 100%);
+    }
+
+    .voice-bubble {
+      width: min(242px, 100%);
+    }
+
+    @media (max-width: 390px) {
+      .app-topbar {
+        padding-left: max(9px, env(safe-area-inset-left));
+        padding-right: max(9px, env(safe-area-inset-right));
+      }
+      .topbar-avatar-wrap {
+        width: 34px;
+        height: 34px;
+      }
+      .char-name-header {
+        font-size: 13.8px;
+      }
+      .topbar-status-line {
+        font-size: 10.2px;
+      }
+      .affinity-pill {
+        padding: 3px 7px;
+        font-size: 11px;
+      }
+      .icon-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 12.5px;
+      }
+      .topbar-right {
+        gap: 4px;
+      }
+      .paywall-methods {
+        gap: 4px;
+      }
+      .pay-method-btn {
+        font-size: 10.2px;
+        padding: 7px 2px;
+        white-space: nowrap;
+      }
+      .msg-row.user .msg-content-col {
+        max-width: 86%;
+      }
+    }
+
+    @media (max-width: 345px) {
+      .paywall-methods {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
   </style>
 </head>
 <body>
@@ -2818,14 +2963,15 @@
           </div>
 
           <form id="chatInputForm" class="input-row" autocomplete="off">
-            <input
+            <textarea
               id="chatTextInput"
-              type="text"
+              rows="1"
               class="chat-text-input"
               placeholder="우석이에게 직접 답장해보세요..."
               maxlength="240"
+              enterkeyhint="send"
               aria-label="자유 메시지 입력"
-            />
+            ></textarea>
             <button type="submit" id="btnChatSend" class="chat-send-btn" aria-label="전송">➤</button>
           </form>
         </div>
@@ -4190,6 +4336,9 @@
       }
 
       return {
+        warmUp() {
+          ensureCtx();
+        },
         msgIn() {
           playTone(640, 0.075, "sine", 0.038, 0);
           playTone(860, 0.1, "sine", 0.035, 0.045);
@@ -6001,6 +6150,8 @@ ${recentChat || "(첫 인사)"}
       if (isBusySending) return;
       if (getRemainingFreeChats() <= 0) {
         DOM.chatTextInput.value = userText;
+        DOM.chatTextInput.style.height = "auto";
+        DOM.chatTextInput.style.height = `${Math.min(DOM.chatTextInput.scrollHeight, 96)}px`;
         openPaywallModal(
           "freetalk_limit",
           "오늘의 무료 수다 10회를 모두 사용했어요 💬",
@@ -6485,18 +6636,45 @@ ${recentChat || "(첫 인사)"}
         saveState();
       });
 
-      DOM.chatInputForm.addEventListener("submit", (e) => {
-        e.preventDefault();
+      function autoResizeChatInput() {
+        const el = DOM.chatTextInput;
+        el.style.height = "auto";
+        el.style.height = `${Math.min(el.scrollHeight, 96)}px`;
+      }
+
+      DOM.chatTextInput.addEventListener("input", autoResizeChatInput);
+
+      function submitChatMessage() {
         if (isBusySending || DOM.chatTextInput.disabled) return;
         const text = DOM.chatTextInput.value.trim();
         if (!text) return;
 
         DOM.chatTextInput.value = "";
+        autoResizeChatInput();
         if (gameState.chatMode === "freetalk") {
           handleFreeTalkSubmit(text);
         } else {
           handleStoryFreeTextSubmit(text);
         }
+      }
+
+      DOM.chatTextInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && !e.shiftKey && !e.isComposing && e.keyCode !== 229) {
+          e.preventDefault();
+          submitChatMessage();
+        }
+      });
+
+      DOM.chatTextInput.addEventListener("focus", () => {
+        setTimeout(() => {
+          if (window.innerWidth <= 520) window.scrollTo(0, 0);
+          scrollChatToBottom();
+        }, 240);
+      });
+
+      DOM.chatInputForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        submitChatMessage();
       });
 
       // 쇼츠 & 포토 모달
@@ -6676,8 +6854,43 @@ ${recentChat || "(첫 인사)"}
       }
     }
 
+    function setupMobileViewportSync() {
+      const updateViewport = () => {
+        const vv = window.visualViewport;
+        const height = vv ? Math.round(vv.height) : window.innerHeight;
+        document.documentElement.style.setProperty("--app-height", `${height}px`);
+
+        const isMobile = window.innerWidth <= 520;
+        const keyboardOpen = isMobile && vv && (window.innerHeight - vv.height > 120);
+        document.body.classList.toggle("keyboard-open", Boolean(keyboardOpen));
+
+        if (isMobile) {
+          window.scrollTo(0, 0);
+        }
+        if (keyboardOpen && gameState.currentView === "chat") {
+          scrollChatToBottom();
+        }
+      };
+
+      updateViewport();
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener("resize", updateViewport);
+        window.visualViewport.addEventListener("scroll", updateViewport);
+      }
+      window.addEventListener("resize", updateViewport);
+      window.addEventListener("orientationchange", () => setTimeout(updateViewport, 180));
+
+      // iOS Safari 오디오 잠금 해제 (첫 터치 시)
+      const unlockIosAudio = () => {
+        SoundFX.warmUp();
+        window.removeEventListener("touchstart", unlockIosAudio);
+      };
+      window.addEventListener("touchstart", unlockIosAudio, { passive: true, once: true });
+    }
+
     function initApp() {
       gameState = loadState();
+      setupMobileViewportSync();
 
       applyThumbWithFallback(
         DOM.topbarAvatar,
