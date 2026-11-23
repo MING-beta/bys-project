@@ -2394,6 +2394,294 @@
       opacity: 1;
       transform: translateX(-50%) translateY(0);
     }
+
+    /* ==========================================================================
+       11. 부분유료화 & 잠금 에피소드 (EP.6~20) & 임시 결제 팝업 UI
+       ========================================================================== */
+    .ep-card.is-locked {
+      background: #FAF3F2;
+      border-style: dashed;
+      border-color: rgba(166, 146, 151, 0.42);
+      opacity: 0.92;
+    }
+
+    .ep-card.is-locked:hover {
+      border-color: var(--gold);
+      box-shadow: 0 8px 20px rgba(223, 149, 58, 0.16);
+    }
+
+    .ep-card.is-locked .ep-thumb-img {
+      filter: blur(5px) grayscale(0.45) brightness(0.62);
+      transform: scale(1.08);
+    }
+
+    .ep-lock-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(42, 30, 34, 0.45);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      color: #FFFFFF;
+    }
+
+    .ep-lock-overlay .lock-ico {
+      font-size: 18px;
+      line-height: 1;
+    }
+
+    .ep-lock-overlay .lock-txt {
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: rgba(223, 149, 58, 0.92);
+    }
+
+    .ep-price-badge {
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #3A2B2E 0%, #6B484E 100%);
+      color: #FFE8B6;
+      white-space: nowrap;
+    }
+
+    .brand-vip-btn {
+      font-family: inherit;
+      font-size: 10.8px;
+      font-weight: 800;
+      color: #FFF6E0;
+      background: linear-gradient(135deg, #3A2B2E 0%, #6D444C 100%);
+      border: 1px solid rgba(223, 149, 58, 0.65);
+      padding: 4px 10px;
+      border-radius: 999px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(58, 43, 46, 0.18);
+      transition: transform 0.15s ease;
+    }
+
+    .brand-vip-btn:hover { transform: translateY(-1px); }
+
+    .freetalk-pill.is-exhausted {
+      background: #FEE2E2;
+      color: #B91C1C;
+    }
+
+    /* 임시 결제 팝업 전용 스타일 */
+    .paywall-card {
+      padding: 0;
+      overflow: hidden;
+      border: 1.5px solid rgba(223, 149, 58, 0.45);
+    }
+
+    .paywall-hero {
+      position: relative;
+      padding: 18px 18px 16px;
+      background: linear-gradient(135deg, #3A2B2E 0%, #6E3F49 58%, #B54F59 100%);
+      color: #FFFFFF;
+    }
+
+    .paywall-hero-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .paywall-vip-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: rgba(255, 232, 182, 0.2);
+      border: 1px solid rgba(255, 232, 182, 0.55);
+      color: #FFE8B6;
+      font-size: 10.5px;
+      font-weight: 800;
+    }
+
+    .paywall-close {
+      width: 28px;
+      height: 28px;
+      border-radius: 9px;
+      border: none;
+      background: rgba(255, 255, 255, 0.18);
+      color: #FFFFFF;
+      font-size: 17px;
+      cursor: pointer;
+    }
+
+    .paywall-title {
+      font-size: 17px;
+      font-weight: 800;
+      line-height: 1.35;
+      margin-bottom: 4px;
+    }
+
+    .paywall-sub {
+      font-size: 12px;
+      color: #FBE4E7;
+      line-height: 1.48;
+    }
+
+    .paywall-body {
+      padding: 15px 16px 18px;
+    }
+
+    .paywall-plan-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 13px;
+    }
+
+    .paywall-plan {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 11px 12px;
+      border-radius: 15px;
+      border: 1.5px solid var(--border-light);
+      background: #FFFDFC;
+      cursor: pointer;
+      text-align: left;
+      width: 100%;
+      font-family: inherit;
+      transition: all 0.15s ease;
+    }
+
+    .paywall-plan:hover {
+      border-color: rgba(214, 109, 117, 0.45);
+    }
+
+    .paywall-plan.selected {
+      border-color: var(--rose-deep);
+      background: linear-gradient(135deg, #FFF9FA 0%, #FFF0F2 100%);
+      box-shadow: 0 6px 16px rgba(214, 109, 117, 0.14);
+    }
+
+    .plan-left { min-width: 0; }
+    .plan-name-row {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+    .plan-name {
+      font-size: 13.2px;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+    .plan-badge {
+      font-size: 9.2px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 999px;
+      color: #FFFFFF;
+      background: linear-gradient(135deg, #DF953A, #D66D75);
+    }
+    .plan-desc {
+      font-size: 11px;
+      color: var(--text-sub);
+      margin-top: 2px;
+    }
+    .plan-price-col {
+      text-align: right;
+      flex-shrink: 0;
+    }
+    .plan-orig-price {
+      font-size: 10px;
+      color: var(--text-muted);
+      text-decoration: line-through;
+    }
+    .plan-price {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--rose-dark);
+    }
+
+    .paywall-methods-label {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--text-sub);
+      margin-bottom: 6px;
+    }
+
+    .paywall-methods {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-bottom: 13px;
+    }
+
+    .pay-method-btn {
+      padding: 7px 4px;
+      border-radius: 10px;
+      border: 1.2px solid #E5D6D9;
+      background: #FFFFFF;
+      font-family: inherit;
+      font-size: 10.8px;
+      font-weight: 700;
+      color: var(--text-sub);
+      cursor: pointer;
+    }
+
+    .pay-method-btn.selected {
+      border-color: #3A2B2E;
+      background: #3A2B2E;
+      color: #FFFFFF;
+    }
+
+    .paywall-cta-btn {
+      width: 100%;
+      padding: 13px 14px;
+      border: none;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #E88D96 0%, #D66D75 55%, #B54F59 100%);
+      color: #FFFFFF;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 10px 22px rgba(214, 109, 117, 0.34);
+    }
+
+    .paywall-cta-btn:active { transform: scale(0.98); }
+
+    .paywall-prank-box {
+      display: none;
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: #FFF8EB;
+      border: 1.2px dashed #DF953A;
+      color: #7C4A15;
+      font-size: 11.6px;
+      line-height: 1.5;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .paywall-prank-box.show {
+      display: block;
+      animation: fadeSlideIn 0.24s ease;
+    }
+
+    .paywall-footnote {
+      margin-top: 9px;
+      text-align: center;
+      font-size: 10px;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
   </style>
 </head>
 <body>
@@ -2439,7 +2727,7 @@
 
           <div class="brand-hero-banner">
             <span class="brand-logo-text">변연시</span>
-            <span class="brand-sub-pill">변우석 연애 시뮬레이션</span>
+            <button type="button" id="btnOpenVipShop" class="brand-vip-btn">💎 VIP 상점</button>
           </div>
 
           <!-- 캐릭터 히어로 카드 -->
@@ -2484,17 +2772,17 @@
             <div class="freetalk-info">
               <div class="freetalk-top-row">
                 <span class="freetalk-title">자유 수다방</span>
-                <span class="freetalk-pill">무제한 자유 채팅</span>
+                <span class="freetalk-pill">오늘 무료 10/10회</span>
               </div>
-              <p class="freetalk-desc">스토리 진행 없이 변우석과 끝없이 자유롭게 대화해 보세요! (Gemini AI / 로컬 감성 지원)</p>
+              <p class="freetalk-desc">하루 10회 무료! 스토리 진행 없이 변우석과 자유롭게 대화해 보세요. (Gemini AI / 로컬 감성 지원)</p>
             </div>
             <span class="freetalk-arrow">›</span>
           </button>
 
-          <!-- 5부작 쇼츠 테마 에피소드 -->
+          <!-- 20부작 쇼츠 테마 에피소드 (EP.1~5 무료 / EP.6~20 프리미엄 잠금) -->
           <div class="section-heading">
-            <h2>✨ 쇼츠 테마 에피소드 (5부작)</h2>
-            <span>자유 입력 · 추천 답장</span>
+            <h2>✨ 쇼츠 테마 에피소드 (EP.1~20)</h2>
+            <span>EP.1~5 무료 · EP.6~20 🔒</span>
           </div>
           <div id="lobbyEpisodeList" class="episode-list"></div>
         </div>
@@ -2728,6 +3016,7 @@
             <button type="button" class="dev-mini-btn js-quick-jump" data-jump="ending_normal">🌷 NORMAL</button>
             <button type="button" class="dev-mini-btn js-quick-jump" data-jump="ending_bad">🌧️ BAD</button>
             <button type="button" class="dev-mini-btn" id="btnDevUnlockGallery">🎞️ 5쇼츠·3엔딩 전체 해금</button>
+            <button type="button" class="dev-mini-btn" id="btnDevResetQuota">💬 수다 10회 복구</button>
           </div>
         </div>
       </div>
@@ -2774,6 +3063,94 @@
       </div>
       <div class="modal-action-row" style="margin-top: 8px;">
         <button type="button" id="btnConfirmHardReset" class="btn-danger">앨범·엔딩까지 완전 초기화</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       MODAL 6: 💎 임시 결제 팝업 (부분유료화 프리뷰 UI 전용)
+       ==================================================================== -->
+  <div id="paywallModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="paywallTitle">
+    <div class="modal-card paywall-card">
+      <div class="paywall-hero">
+        <div class="paywall-hero-top">
+          <span class="paywall-vip-chip">👑 BYEONYEONSI BLACK PASS</span>
+          <button type="button" class="paywall-close" data-close-modal="paywallModal" aria-label="닫기">×</button>
+        </div>
+        <h2 id="paywallTitle" class="paywall-title">프리미엄 에피소드 잠금 해제</h2>
+        <p id="paywallSub" class="paywall-sub">EP.6~20 전체 오픈, 자유 수다방 무제한, 스페셜 선택지 즉시 해금 혜택을 한 번에 누려보세요!</p>
+      </div>
+
+      <div class="paywall-body">
+        <div class="paywall-plan-list" id="paywallPlanList">
+          <button type="button" class="paywall-plan selected" data-plan="vip" data-price="₩9,900">
+            <div class="plan-left">
+              <div class="plan-name-row">
+                <span class="plan-name">👑 변연시 올패스 VIP</span>
+                <span class="plan-badge">BEST · 인기</span>
+              </div>
+              <div class="plan-desc">EP.6~20 전체 해금 · 자유 수다 무제한 · 스페셜 선택지 무료</div>
+            </div>
+            <div class="plan-price-col">
+              <div class="plan-orig-price">₩19,900</div>
+              <div class="plan-price">₩9,900/월</div>
+            </div>
+          </button>
+
+          <button type="button" class="paywall-plan" data-plan="ep_pack" data-price="₩14,900">
+            <div class="plan-left">
+              <div class="plan-name-row">
+                <span class="plan-name">🎬 에피소드 6~20 합본 팩</span>
+                <span class="plan-badge">40% OFF</span>
+              </div>
+              <div class="plan-desc">미공개 시즌 2~4 (15개 에피소드) 평생 소장</div>
+            </div>
+            <div class="plan-price-col">
+              <div class="plan-orig-price">₩25,000</div>
+              <div class="plan-price">₩14,900</div>
+            </div>
+          </button>
+
+          <button type="button" class="paywall-plan" data-plan="chat_pass" data-price="₩3,900">
+            <div class="plan-left">
+              <div class="plan-name-row">
+                <span class="plan-name">💬 자유 수다 무제한 이용권</span>
+              </div>
+              <div class="plan-desc">하루 10회 무료 제한 해제 · 30일간 24시간 자유 채팅</div>
+            </div>
+            <div class="plan-price-col">
+              <div class="plan-price">₩3,900</div>
+            </div>
+          </button>
+
+          <button type="button" class="paywall-plan" data-plan="hearts" data-price="₩2,900">
+            <div class="plan-left">
+              <div class="plan-name-row">
+                <span class="plan-name">💎 하트 300개 패키지</span>
+              </div>
+              <div class="plan-desc">단건 에피소드 · 잠긴 스페셜 선택지 · 비공개 쇼츠 해금</div>
+            </div>
+            <div class="plan-price-col">
+              <div class="plan-price">₩2,900</div>
+            </div>
+          </button>
+        </div>
+
+        <div class="paywall-methods-label">결제 수단 선택</div>
+        <div class="paywall-methods" id="paywallMethods">
+          <button type="button" class="pay-method-btn selected" data-method="카카오페이">카카오페이</button>
+          <button type="button" class="pay-method-btn" data-method="토스페이">토스페이</button>
+          <button type="button" class="pay-method-btn" data-method="네이버페이">네이버페이</button>
+          <button type="button" class="pay-method-btn" data-method="신용카드">신용카드</button>
+        </div>
+
+        <button type="button" id="btnFakeCheckout" class="paywall-cta-btn">₩9,900 결제하고 지금 바로 열기 💗</button>
+
+        <div id="paywallPrankBox" class="paywall-prank-box"></div>
+
+        <p class="paywall-footnote">
+          ※ 부가세 포함 · 언제든 해지 가능 (테스트용 임시 결제 화면입니다)
+        </p>
       </div>
     </div>
   </div>
@@ -2920,6 +3297,111 @@
         badge: null
       }
     ];
+
+    /* ---------------- EP.6 ~ EP.20 잠금 더미 에피소드 (부분유료화 프리뷰) ---------------- */
+    const LOCKED_DUMMY_EPISODES = [
+      { id: "ep6",  code: "EP.6",  title: "한밤의 비밀 드라이브",      subtitle: "스케줄 끝난 새벽 2시, 한강 야경 아래 단둘의 드라이브",   shortsId: "vPeiPH3hc2Y", locked: true, priceLabel: "💎 30" },
+      { id: "ep7",  code: "EP.7",  title: "비 오는 날의 우산 하나",    subtitle: "갑작스런 소나기, 어깨가 닿을 만큼 가까워진 거리",         shortsId: "YG9G-Rl-M6E", locked: true, priceLabel: "💎 30" },
+      { id: "ep8",  code: "EP.8",  title: "심야 편의점 라면 데이트",   subtitle: "모자 푹 눌러쓰고 집 앞에서 몰래 먹는 야식 타임",          shortsId: "4ArZZ-qgbiY", locked: true, priceLabel: "💎 30" },
+      { id: "ep9",  code: "EP.9",  title: "질투 폭발! 남사친 등장",    subtitle: "'그 사람이랑 왜 그렇게 웃어?' 진지해진 눈빛의 우석",       shortsId: "P4wBkideNng", locked: true, priceLabel: "💎 40" },
+      { id: "ep10", code: "EP.10", title: "제주도 돌담길 스냅 여행",   subtitle: "휴가 내고 단둘이 떠난 제주, 필름 카메라에 담긴 우리",      shortsId: "WtDv3Zh5WbM", locked: true, priceLabel: "👑 VIP" },
+      { id: "ep11", code: "EP.11", title: "밀라노 패션위크 영상통화",  subtitle: "시차 8시간을 넘어 새벽마다 걸려오는 달달한 영통",          shortsId: "vPeiPH3hc2Y", locked: true, priceLabel: "💎 40" },
+      { id: "ep12", code: "EP.12", title: "열애설 스캔들 위기?!",      subtitle: "파파라치 사진이 떴다! 네 손을 놓지 않겠다는 그의 선택",    shortsId: "P4wBkideNng", locked: true, priceLabel: "👑 VIP" },
+      { id: "ep13", code: "EP.13", title: "우석의 비밀 아지트 초대",   subtitle: "직접 내려주는 핸드드립 커피와 LP판 음악이 흐르는 밤",      shortsId: "YG9G-Rl-M6E", locked: true, priceLabel: "💎 50" },
+      { id: "ep14", code: "EP.14", title: "생일 서프라이즈 이벤트",   subtitle: "12시 정각, 케이크와 꽃다발을 들고 집 앞에 찾아온 그",      shortsId: "4ArZZ-qgbiY", locked: true, priceLabel: "💎 50" },
+      { id: "ep15", code: "EP.15", title: "첫눈 오는 날의 남산",       subtitle: "하얀 입김 사이로 나눈 두 번째 고백과 커플 목도리",         shortsId: "WtDv3Zh5WbM", locked: true, priceLabel: "👑 VIP" },
+      { id: "ep16", code: "EP.16", title: "드라마 키스신 질투 작전",   subtitle: "대본 연습 도와주다가 묘해진 공기, 심박수 최고치 돌파",     shortsId: "P4wBkideNng", locked: true, priceLabel: "💎 60" },
+      { id: "ep17", code: "EP.17", title: "둘만의 크리스마스 파티",    subtitle: "반짝이는 트리 아래, 너만을 위해 부르는 캐롤 자장가",       shortsId: "YG9G-Rl-M6E", locked: true, priceLabel: "👑 VIP" },
+      { id: "ep18", code: "EP.18", title: "시상식 대상 소감의 비밀",   subtitle: "무대 위에서 카메라를 보며 건넨 우리 둘만의 암호",          shortsId: "4ArZZ-qgbiY", locked: true, priceLabel: "💎 60" },
+      { id: "ep19", code: "EP.19", title: "우리의 1주년 기념일",       subtitle: "처음 만났던 그 수영장 리조트에서 다시 마주한 아침",       shortsId: "WtDv3Zh5WbM", locked: true, priceLabel: "👑 VIP" },
+      { id: "ep20", code: "EP.20", title: "평생의 약속, 웨딩 화보",    subtitle: "마지막 페이지, 영원히 끝나지 않을 푸르른 봄의 엔딩",       shortsId: "vPeiPH3hc2Y", locked: true, priceLabel: "👑 VIP" }
+    ];
+    EPISODES.push(...LOCKED_DUMMY_EPISODES);
+
+    /* ---------------- 부분유료화: 자유 수다방 하루 10회 무료 제한 & 임시 결제 팝업 ---------------- */
+    const DAILY_FREE_CHAT_LIMIT = 10;
+
+    function getTodayDateKey() {
+      const d = new Date();
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${y}-${m}-${day}`;
+    }
+
+    function ensureDailyFreeChatState() {
+      const today = getTodayDateKey();
+      if (!gameState.dailyFreeChat || gameState.dailyFreeChat.date !== today) {
+        gameState.dailyFreeChat = { date: today, used: 0 };
+      }
+      return gameState.dailyFreeChat;
+    }
+
+    function getRemainingFreeChats() {
+      const st = ensureDailyFreeChatState();
+      return Math.max(0, DAILY_FREE_CHAT_LIMIT - st.used);
+    }
+
+    function consumeFreeChatQuota() {
+      const st = ensureDailyFreeChatState();
+      st.used += 1;
+      saveState();
+      return getRemainingFreeChats();
+    }
+
+    function openPaywallModal(reason = "vip", customTitle = "", customSub = "") {
+      const modal = document.getElementById("paywallModal");
+      if (!modal) return;
+
+      const titleEl = document.getElementById("paywallTitle");
+      const subEl = document.getElementById("paywallSub");
+      const prankBox = document.getElementById("paywallPrankBox");
+
+      const presets = {
+        episode: {
+          title: customTitle || "프리미엄 에피소드 잠금 해제",
+          sub: customSub || "VIP 올패스 또는 에피소드 합본 팩으로 EP.6~20 비공개 스토리를 바로 열어보세요!",
+          defaultPlan: "ep_pack"
+        },
+        freetalk_limit: {
+          title: customTitle || "오늘의 무료 자유 수다 10회 소진 💬",
+          sub: customSub || "무료 횟수는 내일 자정에 초기화돼요. 기다리기 힘들다면 무제한 이용권으로 바로 이어가세요!",
+          defaultPlan: "chat_pass"
+        },
+        special_choice: {
+          title: customTitle || "스페셜 선택지 즉시 해금 ✨",
+          sub: customSub || "호감도나 플래그 조건 없이 하트로 비밀 선택지를 바로 열어볼 수 있어요!",
+          defaultPlan: "hearts"
+        },
+        gallery_short: {
+          title: customTitle || "비공개 쇼츠 클립 즉시 해금 🎞️",
+          sub: customSub || "에피소드를 끝까지 플레이하거나 하트 패키지로 지금 바로 감상하세요!",
+          defaultPlan: "hearts"
+        },
+        vip: {
+          title: customTitle || "변연시 BLACK VIP 상점 💎",
+          sub: customSub || "EP.6~20 전체 해금, 자유 수다 무제한, 스페셜 선택지 프리패스를 한 번에 만나보세요!",
+          defaultPlan: "vip"
+        }
+      };
+
+      const cfg = presets[reason] || presets.vip;
+      titleEl.textContent = cfg.title;
+      subEl.textContent = cfg.sub;
+      prankBox.classList.remove("show");
+      prankBox.textContent = "";
+
+      const plans = modal.querySelectorAll(".paywall-plan");
+      plans.forEach((p) => {
+        const match = p.dataset.plan === cfg.defaultPlan;
+        p.classList.toggle("selected", match);
+        if (match) {
+          document.getElementById("btnFakeCheckout").textContent = `${p.dataset.price} 결제하고 지금 바로 열기 💗`;
+        }
+      });
+
+      modal.classList.add("open");
+    }
 
     const ENDINGS_META = {
       ending_happy: {
@@ -3806,6 +4288,9 @@
         forceLocalFallback: Boolean(preserved.forceLocalFallback),
         hasUnreadGallery: false,
         freeTalkChipOffset: 0,
+        dailyFreeChat: preserved.dailyFreeChat && preserved.dailyFreeChat.date === getTodayDateKey()
+          ? { date: preserved.dailyFreeChat.date, used: Number(preserved.dailyFreeChat.used) || 0 }
+          : { date: getTodayDateKey(), used: 0 },
         lastLocalReplyIdx: {},
         aiConfig: preserved.aiConfig && typeof preserved.aiConfig === "object"
           ? {
@@ -3855,11 +4340,14 @@
           lastLocalReplyIdx: parsed.lastLocalReplyIdx && typeof parsed.lastLocalReplyIdx === "object"
             ? parsed.lastLocalReplyIdx
             : {},
+          dailyFreeChat: parsed.dailyFreeChat && parsed.dailyFreeChat.date === getTodayDateKey()
+            ? { date: parsed.dailyFreeChat.date, used: Math.max(0, Number(parsed.dailyFreeChat.used) || 0) }
+            : { date: getTodayDateKey(), used: 0 },
           aiConfig: {
             apiKey: typeof parsed.aiConfig?.apiKey === "string" ? parsed.aiConfig.apiKey.trim() : "",
-            model: ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"].includes(parsed.aiConfig?.model)
-              ? parsed.aiConfig.model
-              : "gemini-2.5-flash"
+            model: (typeof parsed.aiConfig?.model === "string" && parsed.aiConfig.model.trim() && parsed.aiConfig.model !== "gemini-2.5-flash")
+              ? parsed.aiConfig.model.trim()
+              : "gemini-flash-latest"
           }
         };
       } catch {
@@ -4427,8 +4915,9 @@ ${recentChat || "(첫 인사)"}
       DOM.bottomNav.classList.toggle("hidden-in-chat", isChat);
 
       if (gameState.chatMode === "freetalk" && isChat) {
+        const remain = getRemainingFreeChats();
         DOM.chatContextIcon.textContent = "💬";
-        DOM.chatContextTitle.textContent = "자유 수다방 (무제한 자유 채팅)";
+        DOM.chatContextTitle.textContent = `자유 수다방 · 오늘 무료 ${remain}/${DAILY_FREE_CHAT_LIMIT}회`;
         DOM.btnSwitchChatMode.textContent = "🎬 스토리로";
       } else {
         const ep = EPISODES.find((e) => e.id === gameState.currentEpisodeId) || EPISODES[0];
@@ -4528,19 +5017,27 @@ ${recentChat || "(첫 인사)"}
       DOM.lobbyShortsCount.textContent = `${gameState.unlockedShorts.length} / ${Object.keys(SHORTS_CATALOG).length}`;
       DOM.lobbyEndingsCount.textContent = `${gameState.unlockedEndings.length} / ${Object.keys(ENDINGS_META).length}`;
 
+      const remainFree = getRemainingFreeChats();
+      const freeTalkPill = DOM.btnLobbyFreeTalk.querySelector(".freetalk-pill");
+      if (freeTalkPill) {
+        freeTalkPill.textContent = remainFree > 0 ? `오늘 무료 ${remainFree}/${DAILY_FREE_CHAT_LIMIT}회` : "오늘 무료 소진 🔒";
+        freeTalkPill.classList.toggle("is-exhausted", remainFree <= 0);
+      }
+
       const hasProgress = gameState.history.length > 0;
-      const curEp = EPISODES.find((e) => e.id === gameState.currentEpisodeId) || EPISODES[0];
+      const curEp = EPISODES.find((e) => e.id === gameState.currentEpisodeId && !e.locked) || EPISODES[0];
       DOM.btnLobbyContinue.textContent = hasProgress ? `${curEp.code} 이어하기 ▶` : "EP.1 시작하기 ▶";
 
       DOM.lobbyEpisodeList.innerHTML = "";
       EPISODES.forEach((ep) => {
-        const shortItem = SHORTS_CATALOG[ep.shortsId];
-        const isCurrent = gameState.currentEpisodeId === ep.id && hasProgress;
-        const isCleared = gameState.completedEpisodes.includes(ep.id);
+        const shortItem = SHORTS_CATALOG[ep.shortsId] || SHORTS_CATALOG.WtDv3Zh5WbM;
+        const isLocked = Boolean(ep.locked);
+        const isCurrent = !isLocked && gameState.currentEpisodeId === ep.id && hasProgress;
+        const isCleared = !isLocked && gameState.completedEpisodes.includes(ep.id);
 
         const card = document.createElement("button");
         card.type = "button";
-        card.className = `ep-card${isCurrent ? " is-current" : ""}`;
+        card.className = `ep-card${isCurrent ? " is-current" : ""}${isLocked ? " is-locked" : ""}`;
 
         const thumbWrap = document.createElement("div");
         thumbWrap.className = "ep-thumb-wrap";
@@ -4553,11 +5050,19 @@ ${recentChat || "(첫 인사)"}
         codeBadge.className = "ep-thumb-badge";
         codeBadge.textContent = ep.code;
 
-        const playIcon = document.createElement("span");
-        playIcon.className = "ep-thumb-play";
-        playIcon.textContent = "▶";
+        thumbWrap.append(img, codeBadge);
 
-        thumbWrap.append(img, codeBadge, playIcon);
+        if (isLocked) {
+          const lockOverlay = document.createElement("div");
+          lockOverlay.className = "ep-lock-overlay";
+          lockOverlay.innerHTML = `<span class="lock-ico">🔒</span><span class="lock-txt">PREMIUM</span>`;
+          thumbWrap.appendChild(lockOverlay);
+        } else {
+          const playIcon = document.createElement("span");
+          playIcon.className = "ep-thumb-play";
+          playIcon.textContent = "▶";
+          thumbWrap.appendChild(playIcon);
+        }
 
         const body = document.createElement("div");
         body.className = "ep-body";
@@ -4569,7 +5074,7 @@ ${recentChat || "(첫 인사)"}
         tagGroup.className = "ep-tag-group";
         const tag = document.createElement("span");
         tag.className = "ep-tag";
-        tag.textContent = shortItem.tag;
+        tag.textContent = isLocked ? `${ep.code} · 프리미엄 스토리` : shortItem.tag;
         tagGroup.appendChild(tag);
 
         if (ep.badge) {
@@ -4580,8 +5085,13 @@ ${recentChat || "(첫 인사)"}
         }
 
         const status = document.createElement("span");
-        status.className = "ep-status-pill";
-        status.textContent = isCurrent ? "진행 중 ●" : (isCleared ? "클리어 ✓" : "플레이 ▶");
+        if (isLocked) {
+          status.className = "ep-price-badge";
+          status.textContent = `${ep.priceLabel || "👑 VIP"} 잠금`;
+        } else {
+          status.className = "ep-status-pill";
+          status.textContent = isCurrent ? "진행 중 ●" : (isCleared ? "클리어 ✓" : "무료 플레이 ▶");
+        }
         top.append(tagGroup, status);
 
         const title = document.createElement("div");
@@ -4594,12 +5104,24 @@ ${recentChat || "(첫 인사)"}
 
         const foot = document.createElement("div");
         foot.className = "ep-channel-foot";
-        foot.textContent = `🎬 ${shortItem.channel}`;
+        foot.textContent = isLocked
+          ? "🔒 잠긴 프리미엄 에피소드 · 탭하여 잠금 해제"
+          : `🎬 ${shortItem.channel}`;
 
         body.append(top, title, desc, foot);
         card.append(thumbWrap, body);
 
-        card.addEventListener("click", () => openEpisodeInChat(ep.id, ep.startNode));
+        card.addEventListener("click", () => {
+          if (isLocked) {
+            openPaywallModal(
+              "episode",
+              `🔒 ${ep.code} ${ep.title}`,
+              `${ep.subtitle} — 잠긴 프리미엄 에피소드입니다. VIP 패스나 에피소드 팩으로 지금 열어보세요!`
+            );
+          } else {
+            openEpisodeInChat(ep.id, ep.startNode);
+          }
+        });
         DOM.lobbyEpisodeList.appendChild(card);
       });
     }
@@ -4619,7 +5141,7 @@ ${recentChat || "(첫 인사)"}
       gameState.chatMode = "freetalk";
       if (gameState.freeTalkHistory.length === 0) {
         gameState.freeTalkHistory.push(
-          { kind: "date", text: "💬 자유 수다방 (무제한 자유 채팅)" },
+          { kind: "date", text: "💬 자유 수다방 (하루 10회 무료)" },
           {
             kind: "narration",
             text: "스토리 진행 없이 변우석과 자유롭게 수다를 떨 수 있는 공간입니다. 아래 입력창에 무엇이든 편하게 말해 보세요!"
@@ -4661,8 +5183,10 @@ ${recentChat || "(첫 인사)"}
         } else {
           const lock = document.createElement("div");
           lock.className = "gallery-lock-overlay";
-          lock.innerHTML = `<div class="gallery-lock-icon">🔒</div><div class="gallery-lock-hint">${item.tag}<br/>채팅에서 해금</div>`;
+          lock.innerHTML = `<div class="gallery-lock-icon">🔒</div><div class="gallery-lock-hint">${item.tag}<br/>채팅 또는 💎 즉시 해금</div>`;
           thumb.appendChild(lock);
+          card.style.cursor = "pointer";
+          card.addEventListener("click", () => openPaywallModal("gallery_short", `🎞️ ${item.tag} 쇼츠 즉시 해금`));
         }
 
         const info = document.createElement("div");
@@ -5067,7 +5591,11 @@ ${recentChat || "(첫 인사)"}
           chip.className = "quick-chip is-locked";
           chip.innerHTML = `<span>🔒</span><span>${choice.specialLabel || "스페셜 답장 잠김"}</span>`;
           chip.addEventListener("click", () => {
-            showToast(`해금 조건: ${choice.specialLabel || "플래그 또는 호감도가 부족해요"}`);
+            openPaywallModal(
+              "special_choice",
+              "✨ 스페셜 선택지 즉시 해금",
+              `원래 조건(${choice.specialLabel || "호감도/플래그"}) 없이 💎 하트로 지금 바로 선택할 수 있어요!`
+            );
           });
         } else {
           chip.className = `quick-chip${isConditional ? " is-special" : ""}`;
@@ -5471,6 +5999,20 @@ ${recentChat || "(첫 인사)"}
     /* 자유 수다방 (Free Talk Mode) 제출 처리 */
     async function handleFreeTalkSubmit(userText) {
       if (isBusySending) return;
+      if (getRemainingFreeChats() <= 0) {
+        DOM.chatTextInput.value = userText;
+        openPaywallModal(
+          "freetalk_limit",
+          "오늘의 무료 수다 10회를 모두 사용했어요 💬",
+          "하루 무료 채팅 10회 제한에 도달했습니다. 무제한 이용권이나 VIP 패스로 변우석과 계속 수다 떨어보세요!"
+        );
+        return;
+      }
+      const leftAfterSend = consumeFreeChatQuota();
+      updateTopbarContext(false);
+      if (leftAfterSend === 3 || leftAfterSend === 1) {
+        showToast(`💬 오늘 남은 무료 자유 수다: ${leftAfterSend}회`);
+      }
       isBusySending = true;
 
       SoundFX.msgOut();
@@ -5829,7 +6371,7 @@ ${recentChat || "(첫 인사)"}
     function unlockAllGalleryItems() {
       gameState.unlockedShorts = Object.keys(SHORTS_CATALOG);
       gameState.unlockedEndings = Object.keys(ENDINGS_META);
-      gameState.completedEpisodes = EPISODES.map((e) => e.id);
+      gameState.completedEpisodes = EPISODES.filter((e) => !e.locked).map((e) => e.id);
       gameState.hasUnreadGallery = false;
       DOM.galleryUnreadDot.classList.remove("visible");
 
@@ -5859,7 +6401,8 @@ ${recentChat || "(첫 인사)"}
             aiConfig: gameState.aiConfig,
             soundEnabled: gameState.soundEnabled,
             speedMultiplier: gameState.speedMultiplier,
-            forceLocalFallback: gameState.forceLocalFallback
+            forceLocalFallback: gameState.forceLocalFallback,
+            dailyFreeChat: gameState.dailyFreeChat
           };
 
       gameState = createInitialState(preserved);
@@ -6022,6 +6565,17 @@ ${recentChat || "(첫 인사)"}
 
       document.getElementById("btnDevUnlockGallery").addEventListener("click", unlockAllGalleryItems);
 
+      const devQuotaBtn = document.getElementById("btnDevResetQuota");
+      if (devQuotaBtn) {
+        devQuotaBtn.addEventListener("click", () => {
+          gameState.dailyFreeChat = { date: getTodayDateKey(), used: 0 };
+          saveState();
+          updateTopbarContext(false);
+          renderLobby();
+          showToast("💬 오늘의 자유 수다 무료 10회가 복구되었습니다!");
+        });
+      }
+
       DOM.devForceFallbackCheck.addEventListener("change", (e) => {
         gameState.forceLocalFallback = e.target.checked;
         saveState();
@@ -6072,6 +6626,54 @@ ${recentChat || "(첫 인사)"}
         }
         document.querySelectorAll(".modal-backdrop.open").forEach((m) => m.classList.remove("open"));
       });
+
+      // 💎 VIP 상점 버튼 & 임시 결제 팝업 인터랙션 (UI 전용 장난 팝업)
+      const vipBtn = document.getElementById("btnOpenVipShop");
+      if (vipBtn) {
+        vipBtn.addEventListener("click", () => openPaywallModal("vip"));
+      }
+
+      const paywallModal = document.getElementById("paywallModal");
+      if (paywallModal) {
+        const ctaBtn = document.getElementById("btnFakeCheckout");
+        const prankBox = document.getElementById("paywallPrankBox");
+
+        paywallModal.querySelectorAll(".paywall-plan").forEach((planBtn) => {
+          planBtn.addEventListener("click", () => {
+            paywallModal.querySelectorAll(".paywall-plan").forEach((b) => b.classList.remove("selected"));
+            planBtn.classList.add("selected");
+            ctaBtn.textContent = `${planBtn.dataset.price} 결제하고 지금 바로 열기 💗`;
+            prankBox.classList.remove("show");
+          });
+        });
+
+        paywallModal.querySelectorAll(".pay-method-btn").forEach((mBtn) => {
+          mBtn.addEventListener("click", () => {
+            paywallModal.querySelectorAll(".pay-method-btn").forEach((b) => b.classList.remove("selected"));
+            mBtn.classList.add("selected");
+          });
+        });
+
+        ctaBtn.addEventListener("click", () => {
+          const selectedPlan = paywallModal.querySelector(".paywall-plan.selected");
+          const selectedMethod = paywallModal.querySelector(".pay-method-btn.selected");
+          const planName = selectedPlan?.querySelector(".plan-name")?.textContent || "VIP 패스";
+          const price = selectedPlan?.dataset.price || "₩9,900";
+          const method = selectedMethod?.dataset.method || "카카오페이";
+
+          ctaBtn.disabled = true;
+          ctaBtn.textContent = `${method} 결제창 연결 중... ⏳`;
+
+          setTimeout(() => {
+            ctaBtn.disabled = false;
+            ctaBtn.textContent = `${price} 결제하고 지금 바로 열기 💗`;
+            prankBox.innerHTML = `😂 <strong>짠! 장난용 임시 결제 팝업이에요!</strong><br/>[${planName} / ${method} ${price}] 실제 결제는 전혀 이뤄지지 않습니다.<br/>EP.6~20은 준비 중이니 현재 무료 에피소드(EP.1~5)와 하루 10회 수다를 즐겨주세요!`;
+            prankBox.classList.add("show");
+            SoundFX.unlock();
+            showToast("😎 걱정 마세요! 결제 기능 없는 장난 팝업입니다");
+          }, 550);
+        });
+      }
     }
 
     function initApp() {
