@@ -1,0 +1,5083 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>변연시 — 변우석 연애 시뮬레이션</title>
+
+  <!-- Pretendard & Noto Sans KR 웹폰트 (네트워크 오프라인 시 시스템 한글 폰트 폴백) -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ==========================================================================
+       1. 디자인 토큰 (따뜻한 로즈골드 & 크림 파스텔 테마)
+       ========================================================================== */
+    :root {
+      --primary: #F67280;
+      --primary-dark: #E05768;
+      --primary-soft: #FFF0F2;
+      --rosegold: #D98A7C;
+      --rosegold-soft: #FDF2EE;
+      --champagne: #F3D5B5;
+      --gold: #E89F3C;
+      --gold-soft: #FFF8EB;
+
+      --bg-outer:
+        radial-gradient(circle at 14% 18%, rgba(246, 114, 128, 0.22) 0%, transparent 45%),
+        radial-gradient(circle at 86% 22%, rgba(243, 213, 181, 0.36) 0%, transparent 46%),
+        radial-gradient(circle at 50% 92%, rgba(255, 226, 226, 0.55) 0%, transparent 50%),
+        linear-gradient(145deg, #FFF8F6 0%, #FDF1EE 52%, #FAF0E9 100%);
+      --bg-app: #FFF8F6;
+      --bg-chat: #FCF4F2;
+      --surface: #FFFFFF;
+
+      --text-main: #2D2627;
+      --text-sub: #6E5F61;
+      --text-muted: #A49295;
+
+      --bubble-char-bg: #FFFFFF;
+      --bubble-char-text: #2D2627;
+      --bubble-user-bg: linear-gradient(135deg, #F67280 0%, #E76274 100%);
+      --bubble-user-text: #FFFFFF;
+
+      --border-light: rgba(45, 38, 39, 0.08);
+      --border-rose: rgba(246, 114, 128, 0.22);
+      --shadow-phone: 0 28px 65px rgba(72, 42, 46, 0.16), 0 8px 22px rgba(72, 42, 46, 0.08);
+      --shadow-card: 0 6px 20px rgba(72, 42, 46, 0.06);
+      --font-sans: "Pretendard", "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif;
+    }
+
+    /* ==========================================================================
+       2. 전역 리셋 & 반응형 스마트폰 프레임
+       ========================================================================== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+      font-family: var(--font-sans);
+      color: var(--text-main);
+      background: var(--bg-outer);
+      overflow: hidden;
+    }
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+    }
+
+    .phone-frame {
+      position: relative;
+      width: 100%;
+      max-width: 430px;
+      height: min(872px, 95dvh);
+      background: var(--bg-app);
+      border-radius: 38px;
+      box-shadow: var(--shadow-phone);
+      border: 8px solid #2D2627;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    @media (max-width: 520px) {
+      body {
+        padding: 0;
+        background: var(--bg-app);
+      }
+      .phone-frame {
+        max-width: 100%;
+        height: 100dvh;
+        border-radius: 0;
+        border: none;
+        box-shadow: none;
+      }
+    }
+
+    /* 뷰 컨테이너 */
+    .views-container {
+      position: relative;
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .view-panel {
+      display: none;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+      animation: viewFade 0.22s ease;
+    }
+
+    .view-panel.active {
+      display: flex;
+    }
+
+    @keyframes viewFade {
+      from { opacity: 0.45; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 스크롤 영역 */
+    .scroll-body {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: smooth;
+    }
+
+    .scroll-body::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .scroll-body::-webkit-scrollbar-thumb {
+      background: rgba(164, 146, 149, 0.35);
+      border-radius: 999px;
+    }
+
+    /* 공통 아이콘 버튼 */
+    .icon-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      border: 1px solid var(--border-light);
+      background: rgba(255, 255, 255, 0.92);
+      color: var(--text-sub);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+
+    .icon-btn:hover {
+      background: var(--primary-soft);
+      color: var(--primary-dark);
+      border-color: var(--border-rose);
+    }
+
+    .icon-btn:active {
+      transform: scale(0.92);
+    }
+
+    /* ==========================================================================
+       3. VIEW 1: 로비 (Lobby & 5 Episodes)
+       ========================================================================== */
+    .lobby-scroll {
+      padding: 18px 16px 26px;
+      background: linear-gradient(180deg, #FFEFE9 0%, #FFF8F6 35%, #FCF4F2 100%);
+    }
+
+    .lobby-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .brand-lockup {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .brand-title {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      background: linear-gradient(135deg, #F67280 0%, #C86D7C 55%, #B87B65 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-sub {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-sub);
+    }
+
+    .lobby-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    /* 히어로 프로필 카드 */
+    .hero-card {
+      position: relative;
+      background: #FFFFFF;
+      border-radius: 26px;
+      padding: 18px;
+      border: 1px solid rgba(246, 114, 128, 0.2);
+      box-shadow: 0 14px 32px rgba(246, 114, 128, 0.1);
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .hero-card::before {
+      content: "";
+      position: absolute;
+      top: -42px;
+      right: -30px;
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(246, 114, 128, 0.18) 0%, rgba(243, 213, 181, 0.12) 45%, transparent 72%);
+      pointer-events: none;
+    }
+
+    .hero-profile-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-avatar-ring {
+      width: 74px;
+      height: 74px;
+      border-radius: 24px;
+      padding: 3px;
+      background: linear-gradient(135deg, #F67280 0%, #E8A87C 100%);
+      flex-shrink: 0;
+      box-shadow: 0 8px 18px rgba(246, 114, 128, 0.24);
+    }
+
+    .hero-avatar-img {
+      width: 100%;
+      height: 100%;
+      border-radius: 21px;
+      object-fit: cover;
+      display: block;
+      background: #FFE8E5;
+    }
+
+    .hero-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .hero-rel-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--primary-soft);
+      color: var(--primary-dark);
+      margin-bottom: 5px;
+    }
+
+    .hero-char-name {
+      font-size: 19px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .hero-tagline {
+      font-size: 12.5px;
+      color: var(--text-sub);
+      margin-top: 3px;
+      line-height: 1.42;
+    }
+
+    /* 히어로 통계 & 호감도 게이지 */
+    .hero-stats-box {
+      margin-top: 15px;
+      padding: 13px 14px;
+      background: #FFF9F7;
+      border-radius: 18px;
+      border: 1px solid rgba(246, 114, 128, 0.15);
+    }
+
+    .hero-affinity-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12.5px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .hero-affinity-row .heart-txt {
+      color: var(--primary-dark);
+    }
+
+    .hero-track {
+      width: 100%;
+      height: 9px;
+      background: #F2E4E1;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .hero-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #F9A8A8 0%, #F67280 55%, #D98A7C 100%);
+      transition: width 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .hero-pills {
+      display: flex;
+      gap: 8px;
+      margin-top: 11px;
+    }
+
+    .hero-pill {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      padding: 7px 10px;
+      border-radius: 12px;
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-sub);
+    }
+
+    .hero-pill strong {
+      color: var(--text-main);
+    }
+
+    .hero-cta-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .btn-hero-primary {
+      flex: 1.45;
+      padding: 13px 14px;
+      border: none;
+      border-radius: 15px;
+      background: linear-gradient(135deg, #F67280 0%, #E45E6E 100%);
+      color: #FFFFFF;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(246, 114, 128, 0.3);
+      transition: transform 0.16s ease, box-shadow 0.16s ease;
+    }
+
+    .btn-hero-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 22px rgba(246, 114, 128, 0.36);
+    }
+
+    .btn-hero-primary:active {
+      transform: scale(0.98);
+    }
+
+    .btn-hero-secondary {
+      flex: 1;
+      padding: 13px 12px;
+      border: 1.5px solid rgba(246, 114, 128, 0.3);
+      border-radius: 15px;
+      background: #FFFFFF;
+      color: var(--primary-dark);
+      font-family: inherit;
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.16s ease;
+    }
+
+    .btn-hero-secondary:hover {
+      background: var(--primary-soft);
+    }
+
+    /* 에피소드 리스트 */
+    .section-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 11px;
+      padding: 0 2px;
+    }
+
+    .section-heading h2 {
+      font-size: 15.5px;
+      font-weight: 800;
+      color: var(--text-main);
+      letter-spacing: -0.02em;
+    }
+
+    .section-heading span {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .episode-list {
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+    }
+
+    .ep-card {
+      position: relative;
+      display: flex;
+      align-items: stretch;
+      gap: 12px;
+      background: #FFFFFF;
+      border-radius: 20px;
+      padding: 10px;
+      border: 1.5px solid var(--border-light);
+      box-shadow: var(--shadow-card);
+      cursor: pointer;
+      text-align: left;
+      width: 100%;
+      font-family: inherit;
+      transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .ep-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(246, 114, 128, 0.48);
+      box-shadow: 0 10px 24px rgba(246, 114, 128, 0.14);
+    }
+
+    .ep-card:active {
+      transform: scale(0.985);
+    }
+
+    .ep-card.is-current {
+      border-color: var(--primary);
+      background: linear-gradient(135deg, #FFFFFF 64%, #FFF3F4 100%);
+    }
+
+    .ep-thumb-wrap {
+      position: relative;
+      width: 80px;
+      height: 102px;
+      border-radius: 14px;
+      overflow: hidden;
+      flex-shrink: 0;
+      background: #F4E2DF;
+    }
+
+    .ep-thumb-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .ep-thumb-badge {
+      position: absolute;
+      left: 6px;
+      top: 6px;
+      padding: 2px 6px;
+      border-radius: 7px;
+      background: rgba(45, 38, 39, 0.78);
+      backdrop-filter: blur(4px);
+      color: #FFFFFF;
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .ep-thumb-play {
+      position: absolute;
+      right: 6px;
+      bottom: 6px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: rgba(246, 114, 128, 0.94);
+      color: #FFFFFF;
+      font-size: 10px;
+      padding-left: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+    }
+
+    .ep-body {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 2px 2px 2px 0;
+    }
+
+    .ep-meta-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .ep-tag-group {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+
+    .ep-tag {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #9C5B53;
+      background: var(--rosegold-soft);
+      padding: 2px 8px;
+      border-radius: 999px;
+    }
+
+    .ep-special-badge {
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 999px;
+      letter-spacing: 0.02em;
+    }
+
+    .ep-special-badge.badge-new {
+      background: linear-gradient(135deg, #F67280, #FF9A76);
+      color: #FFFFFF;
+      box-shadow: 0 2px 6px rgba(246, 114, 128, 0.35);
+    }
+
+    .ep-special-badge.badge-expanded {
+      background: linear-gradient(135deg, #E89F3C, #F67280);
+      color: #FFFFFF;
+      box-shadow: 0 2px 6px rgba(232, 159, 60, 0.32);
+    }
+
+    .ep-status-pill {
+      font-size: 10.5px;
+      font-weight: 800;
+      color: var(--primary-dark);
+      white-space: nowrap;
+    }
+
+    .ep-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-top: 4px;
+      letter-spacing: -0.02em;
+    }
+
+    .ep-desc {
+      font-size: 12px;
+      line-height: 1.44;
+      color: var(--text-sub);
+      margin-top: 3px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .ep-channel-foot {
+      margin-top: 5px;
+      font-size: 10.5px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    /* ==========================================================================
+       4. VIEW 2: 채팅 (Messenger Game View)
+       ========================================================================== */
+    .chat-header {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-light);
+      padding: 12px 14px 10px;
+      z-index: 20;
+      flex-shrink: 0;
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .profile-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .avatar-wrap {
+      position: relative;
+      width: 42px;
+      height: 42px;
+      flex-shrink: 0;
+    }
+
+    .avatar-img {
+      width: 100%;
+      height: 100%;
+      border-radius: 15px;
+      object-fit: cover;
+      background: #FFE8E5;
+      border: 1.5px solid rgba(246, 114, 128, 0.36);
+      display: block;
+    }
+
+    .online-dot {
+      position: absolute;
+      right: -2px;
+      bottom: -2px;
+      width: 11px;
+      height: 11px;
+      background: #22C55E;
+      border: 2px solid #FFFFFF;
+      border-radius: 50%;
+    }
+
+    .profile-meta {
+      min-width: 0;
+    }
+
+    .char-name-row {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .char-name {
+      font-size: 15.5px;
+      font-weight: 800;
+      color: var(--text-main);
+      letter-spacing: -0.02em;
+    }
+
+    .verified-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #F67280, #E8A87C);
+      color: #FFFFFF;
+      font-size: 9px;
+      font-weight: 800;
+    }
+
+    .ep-chip-mini {
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 6px;
+      background: var(--primary-soft);
+      color: var(--primary-dark);
+    }
+
+    .char-status {
+      font-size: 11.5px;
+      color: var(--text-sub);
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .char-status.is-typing {
+      color: var(--primary-dark);
+      font-weight: 700;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+
+    /* 채팅방 상단 실시간 호감도 바 */
+    .affinity-bar-wrap {
+      position: relative;
+      margin-top: 9px;
+      padding: 6px 10px;
+      background: #FFF7F5;
+      border-radius: 12px;
+      border: 1px solid rgba(246, 114, 128, 0.2);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .affinity-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11.5px;
+      font-weight: 800;
+      color: var(--primary-dark);
+      flex-shrink: 0;
+    }
+
+    .affinity-heart-icon {
+      display: inline-block;
+      transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .affinity-heart-icon.pop {
+      transform: scale(1.55);
+    }
+
+    .affinity-track {
+      flex: 1;
+      height: 7px;
+      background: #F2E4E1;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .affinity-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #F9A8A8 0%, #F67280 55%, #D98A7C 100%);
+      border-radius: 999px;
+      transition: width 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .affinity-score {
+      font-size: 11.5px;
+      font-weight: 800;
+      color: var(--text-main);
+      min-width: 44px;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .affinity-float {
+      position: absolute;
+      right: 12px;
+      top: -10px;
+      font-size: 12.5px;
+      font-weight: 800;
+      padding: 3px 10px;
+      border-radius: 999px;
+      pointer-events: none;
+      animation: floatUpFade 1.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      z-index: 30;
+      box-shadow: 0 5px 14px rgba(45, 38, 39, 0.12);
+    }
+
+    .affinity-float.positive {
+      background: #FFF0F2;
+      color: #E05768;
+      border: 1px solid #FBC4CB;
+    }
+
+    .affinity-float.negative {
+      background: #F3F0F0;
+      color: #6E5F61;
+      border: 1px solid #D8CECF;
+    }
+
+    @keyframes floatUpFade {
+      0% { opacity: 0; transform: translateY(8px) scale(0.85); }
+      20% { opacity: 1; transform: translateY(-6px) scale(1.1); }
+      75% { opacity: 1; transform: translateY(-22px) scale(1); }
+      100% { opacity: 0; transform: translateY(-32px) scale(0.95); }
+    }
+
+    /* 채팅 피드 */
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 15px 13px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background-color: var(--bg-chat);
+      background-image: radial-gradient(rgba(246, 114, 128, 0.08) 1px, transparent 1px);
+      background-size: 20px 20px;
+      scroll-behavior: smooth;
+    }
+
+    .msg-date-divider {
+      align-self: center;
+      margin: 8px 0 4px;
+      padding: 5px 14px;
+      border-radius: 999px;
+      background: rgba(217, 138, 124, 0.14);
+      color: #8A4F46;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+
+    .msg-narration {
+      align-self: center;
+      max-width: 92%;
+      margin: 4px 0;
+      padding: 10px 14px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid rgba(246, 114, 128, 0.18);
+      color: #5F5053;
+      font-size: 12.5px;
+      font-style: italic;
+      line-height: 1.58;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(45, 38, 39, 0.04);
+      animation: fadeSlideIn 0.3s ease forwards;
+      word-break: keep-all;
+    }
+
+    .msg-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      max-width: 100%;
+      animation: fadeSlideIn 0.28s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    .msg-row.char {
+      align-items: flex-start;
+      justify-content: flex-start;
+    }
+
+    .msg-row.user {
+      justify-content: flex-end;
+    }
+
+    .msg-row.consecutive {
+      margin-top: -5px;
+    }
+
+    .msg-char-avatar-slot {
+      width: 34px;
+      flex-shrink: 0;
+    }
+
+    .msg-char-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      object-fit: cover;
+      background: #FFE8E5;
+      border: 1px solid rgba(246, 114, 128, 0.28);
+      display: block;
+    }
+
+    .msg-content-col {
+      display: flex;
+      flex-direction: column;
+      max-width: 81%;
+    }
+
+    .msg-sender-name {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text-sub);
+      margin-bottom: 4px;
+      margin-left: 2px;
+    }
+
+    .bubble-line {
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+    }
+
+    .msg-row.user .bubble-line {
+      flex-direction: row-reverse;
+    }
+
+    .bubble {
+      padding: 10px 14px;
+      font-size: 14px;
+      line-height: 1.54;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+      white-space: pre-wrap;
+      box-shadow: 0 2px 7px rgba(45, 38, 39, 0.05);
+    }
+
+    .msg-row.char .bubble {
+      background: var(--bubble-char-bg);
+      color: var(--bubble-char-text);
+      border-radius: 4px 18px 18px 18px;
+      border: 1px solid rgba(45, 38, 39, 0.06);
+    }
+
+    .msg-row.char.consecutive .bubble {
+      border-radius: 18px;
+    }
+
+    .msg-row.user .bubble {
+      background: var(--bubble-user-bg);
+      color: var(--bubble-user-text);
+      border-radius: 18px 4px 18px 18px;
+    }
+
+    .msg-meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1px;
+      flex-shrink: 0;
+      margin-bottom: 2px;
+    }
+
+    .msg-row.user .msg-meta {
+      align-items: flex-end;
+    }
+
+    .msg-read-mark {
+      font-size: 9.5px;
+      font-weight: 800;
+      color: var(--primary-dark);
+    }
+
+    .msg-time {
+      font-size: 10px;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    /* 포토 카드 버블 */
+    .photo-card-bubble {
+      width: 224px;
+      max-width: 100%;
+      background: #FFFFFF;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid rgba(246, 114, 128, 0.22);
+      box-shadow: 0 6px 18px rgba(45, 38, 39, 0.08);
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .photo-card-bubble:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(246, 114, 128, 0.16);
+    }
+
+    .photo-card-img-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      background: #F4E2DF;
+      overflow: hidden;
+    }
+
+    .photo-card-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .photo-zoom-pill {
+      position: absolute;
+      right: 8px;
+      bottom: 8px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(45, 38, 39, 0.72);
+      color: #FFFFFF;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .photo-card-caption {
+      padding: 9px 11px 10px;
+      font-size: 12.5px;
+      line-height: 1.46;
+      color: var(--text-main);
+      font-weight: 500;
+      word-break: keep-all;
+    }
+
+    /* 9:16 세로형 유튜브 쇼츠 프리뷰 카드 버블 */
+    .shorts-card-bubble {
+      width: 196px;
+      max-width: 100%;
+      background: #231C1D;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 2px solid rgba(246, 114, 128, 0.42);
+      box-shadow: 0 12px 26px rgba(45, 38, 39, 0.18);
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .shorts-card-bubble:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 30px rgba(246, 114, 128, 0.28);
+    }
+
+    .shorts-vertical-stage {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 9 / 16;
+      background: #1C1617;
+      overflow: hidden;
+    }
+
+    .shorts-thumb-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.4s ease;
+    }
+
+    .shorts-card-bubble:hover .shorts-thumb-img {
+      transform: scale(1.05);
+    }
+
+    .shorts-vertical-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        180deg,
+        rgba(28, 22, 23, 0.58) 0%,
+        rgba(28, 22, 23, 0.14) 38%,
+        rgba(28, 22, 23, 0.2) 60%,
+        rgba(28, 22, 23, 0.88) 100%
+      );
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 10px;
+    }
+
+    .shorts-top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .shorts-badge-top {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(246, 114, 128, 0.94);
+      color: #FFFFFF;
+      font-size: 9.5px;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+    }
+
+    .shorts-ratio-pill {
+      padding: 2px 6px;
+      border-radius: 6px;
+      background: rgba(0, 0, 0, 0.48);
+      color: #FDECEB;
+      font-size: 9px;
+      font-weight: 700;
+    }
+
+    .shorts-center-play {
+      align-self: center;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.94);
+      color: #E05768;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      padding-left: 3px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+      animation: pulsePlay 2.2s infinite;
+    }
+
+    @keyframes pulsePlay {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(246, 114, 128, 0.58); }
+      50% { transform: scale(1.06); box-shadow: 0 0 0 11px rgba(246, 114, 128, 0); }
+    }
+
+    .shorts-bottom-meta {
+      color: #FFFFFF;
+    }
+
+    .shorts-channel-txt {
+      font-size: 10px;
+      font-weight: 700;
+      color: #FFD1D6;
+      margin-bottom: 3px;
+    }
+
+    .shorts-title-txt {
+      font-size: 12.5px;
+      font-weight: 800;
+      line-height: 1.35;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+      word-break: keep-all;
+    }
+
+    .shorts-watch-pill {
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      width: 100%;
+      padding: 6px 8px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      color: #FFFFFF;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    /* 보이스 노트 버블 (EP.4 감성 청춘) */
+    .voice-bubble {
+      width: 244px;
+      max-width: 100%;
+      background: linear-gradient(135deg, #FFFFFF 0%, #FFF4F0 100%);
+      border: 1.5px solid rgba(217, 138, 124, 0.34);
+      border-radius: 4px 18px 18px 18px;
+      padding: 12px 13px;
+      box-shadow: 0 5px 15px rgba(217, 138, 124, 0.1);
+    }
+
+    .voice-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .voice-play-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      background: linear-gradient(135deg, #F67280 0%, #D98A7C 100%);
+      color: #FFFFFF;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 4px 10px rgba(246, 114, 128, 0.34);
+    }
+
+    .voice-wave {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      height: 26px;
+    }
+
+    .voice-bar {
+      flex: 1;
+      border-radius: 999px;
+      background: #F0D2CE;
+      transition: background 0.2s ease;
+    }
+
+    .voice-bubble.playing .voice-bar {
+      background: #F67280;
+      animation: voiceWavePulse 0.85s infinite ease-in-out;
+    }
+
+    .voice-bubble.playing .voice-bar:nth-child(odd) { animation-delay: 0.18s; }
+    .voice-bubble.playing .voice-bar:nth-child(3n) { animation-delay: 0.36s; }
+
+    @keyframes voiceWavePulse {
+      0%, 100% { transform: scaleY(0.42); }
+      50% { transform: scaleY(1.18); }
+    }
+
+    .voice-timer {
+      font-size: 11px;
+      font-weight: 800;
+      color: #B4605B;
+      font-variant-numeric: tabular-nums;
+      min-width: 32px;
+      text-align: right;
+    }
+
+    .voice-transcript {
+      margin-top: 9px;
+      padding-top: 8px;
+      border-top: 1px dashed rgba(217, 138, 124, 0.3);
+      font-size: 12.5px;
+      line-height: 1.54;
+      color: #544547;
+      font-style: italic;
+      word-break: keep-all;
+    }
+
+    .voice-watch-link {
+      margin-top: 8px;
+      width: 100%;
+      padding: 6px 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(246, 114, 128, 0.28);
+      background: #FFFFFF;
+      color: var(--primary-dark);
+      font-family: inherit;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .voice-watch-link:hover {
+      background: var(--primary-soft);
+    }
+
+    /* 타이핑 인디케이터 */
+    .typing-bubble {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 11px 15px;
+      background: #FFFFFF;
+      border-radius: 4px 18px 18px 18px;
+      border: 1px solid rgba(45, 38, 39, 0.06);
+      box-shadow: 0 2px 6px rgba(45, 38, 39, 0.05);
+    }
+
+    .typing-dot {
+      width: 6.5px;
+      height: 6.5px;
+      border-radius: 50%;
+      background: #D5C4C6;
+      animation: typingBounce 1.2s infinite ease-in-out;
+    }
+
+    .typing-dot:nth-child(2) { animation-delay: 0.18s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.36s; }
+
+    @keyframes typingBounce {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.45; }
+      30% { transform: translateY(-5px); opacity: 1; background: var(--primary); }
+    }
+
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 에피소드 클리어 브릿지 카드 */
+    .chapter-clear-card {
+      margin: 12px 4px 6px;
+      padding: 18px 16px;
+      border-radius: 22px;
+      background: linear-gradient(155deg, #FFFFFF 0%, #FFF3F4 62%, #FDF0E6 100%);
+      border: 1.5px solid rgba(246, 114, 128, 0.3);
+      box-shadow: 0 10px 24px rgba(246, 114, 128, 0.12);
+      text-align: center;
+      animation: fadeSlideIn 0.4s ease forwards;
+    }
+
+    .chapter-clear-badge {
+      display: inline-block;
+      padding: 4px 11px;
+      border-radius: 999px;
+      background: var(--primary-soft);
+      color: var(--primary-dark);
+      font-size: 11px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .chapter-clear-title {
+      font-size: 16.5px;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+
+    .chapter-clear-desc {
+      font-size: 12.5px;
+      color: var(--text-sub);
+      line-height: 1.54;
+      margin-bottom: 14px;
+      word-break: keep-all;
+    }
+
+    .chapter-clear-btns {
+      display: flex;
+      gap: 8px;
+    }
+
+    /* 엔딩 카드 */
+    .ending-card {
+      margin: 14px 2px 8px;
+      border-radius: 24px;
+      overflow: hidden;
+      background: #FFFFFF;
+      border: 2px solid rgba(246, 114, 128, 0.35);
+      box-shadow: 0 14px 32px rgba(45, 38, 39, 0.14);
+      text-align: center;
+      animation: fadeSlideIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    .ending-card.grade-happy { border-color: #F67280; }
+    .ending-card.grade-normal { border-color: #D98A7C; }
+    .ending-card.grade-bad { border-color: #9E8F91; }
+
+    .ending-visual {
+      position: relative;
+      width: 100%;
+      height: 160px;
+      overflow: hidden;
+      background: #2D2627;
+    }
+
+    .ending-visual img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .ending-visual-grad {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(28, 22, 23, 0.18) 0%, rgba(28, 22, 23, 0.82) 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 14px;
+    }
+
+    .ending-rank-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      margin-bottom: 6px;
+    }
+
+    .grade-happy .ending-rank-badge { background: #F67280; color: #FFFFFF; }
+    .grade-normal .ending-rank-badge { background: #D98A7C; color: #FFFFFF; }
+    .grade-bad .ending-rank-badge { background: #64585A; color: #FFFFFF; }
+
+    .ending-visual-title {
+      color: #FFFFFF;
+      font-size: 19px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+    }
+
+    .ending-body {
+      padding: 18px 16px 20px;
+    }
+
+    .ending-epilogue {
+      font-size: 13.5px;
+      line-height: 1.66;
+      color: var(--text-sub);
+      margin-bottom: 14px;
+      word-break: keep-all;
+    }
+
+    .ending-stats {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .ending-stat-pill {
+      padding: 5px 11px;
+      border-radius: 10px;
+      background: #FAF2F0;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .ending-btn-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    /* 하단 선택지 트레이 */
+    .interaction-area {
+      background: rgba(255, 255, 255, 0.97);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid var(--border-light);
+      padding: 10px 13px 12px;
+      flex-shrink: 0;
+      z-index: 15;
+    }
+
+    .waiting-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 15px;
+      border-radius: 999px;
+      background: #F8F0EE;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .waiting-bar-send {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #E0CECB;
+      color: #FFFFFF;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+
+    .choices-header {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-sub);
+      margin-bottom: 7px;
+      padding: 0 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .choices-list {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      max-height: 224px;
+      overflow-y: auto;
+    }
+
+    .choice-btn {
+      width: 100%;
+      text-align: left;
+      padding: 11px 14px;
+      border-radius: 15px;
+      border: 1.5px solid rgba(246, 114, 128, 0.26);
+      background: #FFFFFF;
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 13.5px;
+      font-weight: 600;
+      line-height: 1.44;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      box-shadow: 0 2px 7px rgba(45, 38, 39, 0.04);
+      transition: all 0.16s ease;
+      animation: choiceSlideUp 0.26s cubic-bezier(0.22, 1, 0.36, 1) both;
+      word-break: keep-all;
+    }
+
+    .choice-btn:hover {
+      background: var(--primary-soft);
+      border-color: var(--primary);
+      transform: translateY(-1px);
+    }
+
+    .choice-btn:active {
+      transform: scale(0.985);
+    }
+
+    /* 골든 스페셜 조건부 선택지 */
+    .choice-btn.is-special {
+      background: linear-gradient(135deg, #FFFBF0 0%, #FFF0F2 100%);
+      border-color: #E89F3C;
+      box-shadow: 0 4px 12px rgba(232, 159, 60, 0.18);
+    }
+
+    .choice-btn.is-special:hover {
+      background: linear-gradient(135deg, #FEF2D6 0%, #FFE4E8 100%);
+      border-color: #D48824;
+    }
+
+    .special-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #E89F3C, #F67280);
+      color: #FFFFFF;
+      margin-bottom: 4px;
+    }
+
+    .choice-text-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .choice-arrow {
+      color: var(--primary);
+      font-size: 16px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    @keyframes choiceSlideUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ==========================================================================
+       5. VIEW 3: 갤러리 (5종 쇼츠 앨범 & 3종 엔딩 도감)
+       ========================================================================== */
+    .gallery-header {
+      background: rgba(255, 255, 255, 0.95);
+      border-bottom: 1px solid var(--border-light);
+      padding: 15px 16px 13px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .gallery-header h1 {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .gallery-scroll {
+      padding: 16px 15px 28px;
+      background: linear-gradient(180deg, #FFF8F6 0%, #FAF0EC 100%);
+    }
+
+    .shorts-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 11px;
+      margin-bottom: 24px;
+    }
+
+    .gallery-short-card {
+      position: relative;
+      background: #FFFFFF;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid var(--border-light);
+      box-shadow: var(--shadow-card);
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.18s ease, border-color 0.18s ease;
+    }
+
+    .gallery-short-card.unlocked {
+      cursor: pointer;
+    }
+
+    .gallery-short-card.unlocked:hover {
+      transform: translateY(-2px);
+      border-color: rgba(246, 114, 128, 0.48);
+    }
+
+    .gallery-short-thumb {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 9 / 13;
+      background: #2D2627;
+      overflow: hidden;
+    }
+
+    .gallery-short-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .gallery-short-card.locked .gallery-short-thumb img {
+      filter: blur(10px) grayscale(0.4) brightness(0.58);
+      transform: scale(1.12);
+    }
+
+    .gallery-lock-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      color: #FFFFFF;
+      text-align: center;
+      padding: 10px;
+      background: rgba(34, 26, 28, 0.38);
+    }
+
+    .gallery-lock-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .gallery-lock-hint {
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.38;
+    }
+
+    .gallery-play-badge {
+      position: absolute;
+      right: 8px;
+      bottom: 8px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(246, 114, 128, 0.94);
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      padding-left: 2px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.28);
+    }
+
+    .gallery-short-info {
+      padding: 10px 10px 11px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .gallery-short-tag {
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--primary-dark);
+      margin-bottom: 3px;
+    }
+
+    .gallery-short-title {
+      font-size: 12.5px;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.36;
+      word-break: keep-all;
+    }
+
+    .gallery-short-channel {
+      font-size: 10.5px;
+      color: var(--text-muted);
+      margin-top: 5px;
+      font-weight: 600;
+    }
+
+    /* 엔딩 도감 카드 리스트 */
+    .ending-dex-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .dex-ending-card {
+      background: #FFFFFF;
+      border-radius: 18px;
+      padding: 13px 14px;
+      border: 1px solid var(--border-light);
+      box-shadow: var(--shadow-card);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .dex-ending-card.locked {
+      opacity: 0.78;
+      background: #F9F2F0;
+    }
+
+    .dex-ending-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    .dex-ending-icon.happy { background: #FFE6EA; }
+    .dex-ending-icon.normal { background: #FCECE4; }
+    .dex-ending-icon.bad { background: #EAE4E4; }
+
+    .dex-ending-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .dex-ending-rank {
+      font-size: 10.5px;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+      color: var(--primary-dark);
+    }
+
+    .dex-ending-card.locked .dex-ending-rank {
+      color: var(--text-muted);
+    }
+
+    .dex-ending-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-top: 2px;
+    }
+
+    .dex-ending-desc {
+      font-size: 11.5px;
+      color: var(--text-sub);
+      line-height: 1.46;
+      margin-top: 3px;
+      word-break: keep-all;
+    }
+
+    /* ==========================================================================
+       6. 하단 3단 탭 네비게이션
+       ========================================================================== */
+    .bottom-nav {
+      background: rgba(255, 255, 255, 0.98);
+      border-top: 1px solid var(--border-light);
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      padding: 6px 10px max(8px, env(safe-area-inset-bottom));
+      flex-shrink: 0;
+      z-index: 25;
+    }
+
+    .nav-tab-btn {
+      position: relative;
+      border: none;
+      background: transparent;
+      padding: 6px 4px;
+      border-radius: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      font-family: inherit;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.16s ease;
+    }
+
+    .nav-tab-btn .tab-icon {
+      font-size: 18px;
+      line-height: 1;
+    }
+
+    .nav-tab-btn .tab-label {
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .nav-tab-btn.active {
+      color: var(--primary-dark);
+      background: var(--primary-soft);
+    }
+
+    .nav-badge-dot {
+      position: absolute;
+      top: 5px;
+      right: calc(50% - 16px);
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #F67280;
+      display: none;
+    }
+
+    .nav-badge-dot.visible {
+      display: block;
+    }
+
+    /* ==========================================================================
+       7. 모달 (9:16 유튜브 쇼츠 라이트박스 / 포토 확대 / 개발자 도구 / 리셋)
+       ========================================================================== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(28, 22, 23, 0.72);
+      backdrop-filter: blur(7px);
+      -webkit-backdrop-filter: blur(7px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 120;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s ease;
+    }
+
+    .modal-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* 9:16 세로형 쇼츠 플레이어 라이트박스 */
+    .shorts-modal-shell {
+      width: 100%;
+      max-width: 356px;
+      background: #1D1718;
+      border-radius: 26px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      box-shadow: 0 28px 60px rgba(0, 0, 0, 0.52);
+      transform: translateY(14px) scale(0.96);
+      transition: transform 0.24s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-backdrop.open .shorts-modal-shell {
+      transform: translateY(0) scale(1);
+    }
+
+    .shorts-modal-head {
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      color: #FFFFFF;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .shorts-modal-title-wrap {
+      min-width: 0;
+    }
+
+    .shorts-modal-tag {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #FDA4AF;
+    }
+
+    .shorts-modal-title {
+      font-size: 14px;
+      font-weight: 800;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .shorts-modal-close {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      border: none;
+      background: rgba(255, 255, 255, 0.14);
+      color: #FFFFFF;
+      font-size: 18px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .shorts-modal-close:hover {
+      background: rgba(255, 255, 255, 0.24);
+    }
+
+    .shorts-iframe-stage {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 9 / 16;
+      max-height: 64dvh;
+      background: #110D0E;
+    }
+
+    .shorts-iframe-stage iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .shorts-modal-foot {
+      padding: 12px 14px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: #261F20;
+    }
+
+    .shorts-modal-note {
+      font-size: 11.5px;
+      color: #DECED0;
+      line-height: 1.46;
+    }
+
+    .shorts-ext-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #F67280 0%, #E05768 100%);
+      color: #FFFFFF;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .shorts-ext-link:hover {
+      filter: brightness(1.06);
+    }
+
+    /* 포토 카드 확대 모달 */
+    .photo-modal-card {
+      width: 100%;
+      max-width: 370px;
+      background: #FFFFFF;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 24px 50px rgba(0, 0, 0, 0.35);
+      transform: translateY(12px) scale(0.96);
+      transition: transform 0.22s ease;
+    }
+
+    .modal-backdrop.open .photo-modal-card {
+      transform: translateY(0) scale(1);
+    }
+
+    .photo-modal-img {
+      width: 100%;
+      max-height: 55dvh;
+      object-fit: cover;
+      display: block;
+      background: #2D2627;
+    }
+
+    .photo-modal-body {
+      padding: 15px 16px 16px;
+    }
+
+    .photo-modal-caption {
+      font-size: 13.5px;
+      color: var(--text-main);
+      line-height: 1.52;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    /* 개발자 상태창 / 초기화 모달 */
+    .modal-card {
+      width: 100%;
+      max-width: 392px;
+      max-height: 86dvh;
+      overflow-y: auto;
+      background: #FFFFFF;
+      border-radius: 24px;
+      padding: 19px;
+      box-shadow: 0 24px 48px rgba(28, 22, 23, 0.3);
+      transform: translateY(12px) scale(0.97);
+      transition: transform 0.22s ease;
+    }
+
+    .modal-backdrop.open .modal-card {
+      transform: translateY(0) scale(1);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      padding-bottom: 11px;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .modal-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .modal-close-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 10px;
+      border: none;
+      background: #F6ECEA;
+      color: var(--text-sub);
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .dev-section {
+      margin-bottom: 14px;
+    }
+
+    .dev-section-title {
+      font-size: 11.5px;
+      font-weight: 800;
+      color: var(--text-sub);
+      margin-bottom: 6px;
+    }
+
+    .dev-box {
+      padding: 11px 12px;
+      border-radius: 14px;
+      background: #FFF9F7;
+      border: 1px solid var(--border-light);
+      font-size: 12.5px;
+    }
+
+    .dev-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .dev-code-pill {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 11.5px;
+      padding: 3px 8px;
+      border-radius: 8px;
+      background: var(--primary-soft);
+      color: var(--primary-dark);
+      font-weight: 700;
+    }
+
+    .dev-slider {
+      width: 100%;
+      accent-color: var(--primary);
+      margin: 8px 0 6px;
+    }
+
+    .dev-btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .dev-mini-btn {
+      padding: 6px 10px;
+      border-radius: 9px;
+      border: 1px solid var(--border-light);
+      background: #FFFFFF;
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .dev-mini-btn:hover {
+      background: var(--primary-soft);
+      border-color: var(--primary);
+      color: var(--primary-dark);
+    }
+
+    .dev-mini-btn.active {
+      background: var(--primary);
+      color: #FFFFFF;
+      border-color: var(--primary);
+    }
+
+    .dev-select {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid #DECED0;
+      font-family: inherit;
+      font-size: 12.5px;
+      background: #FFFFFF;
+      color: var(--text-main);
+    }
+
+    .flag-chip-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .flag-chip {
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: #ECFDF5;
+      color: #047857;
+      border: 1px solid #A7F3D0;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .empty-text {
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+
+    .modal-action-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .btn-secondary, .btn-primary, .btn-danger {
+      flex: 1;
+      padding: 11px 12px;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 800;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-secondary { background: #F4EAE8; color: var(--text-main); }
+    .btn-primary { background: linear-gradient(135deg, #F67280, #E05768); color: #FFFFFF; }
+    .btn-danger { background: #DC4C5B; color: #FFFFFF; }
+
+    /* 토스트 알림 */
+    .toast {
+      position: fixed;
+      bottom: 76px;
+      left: 50%;
+      transform: translateX(-50%) translateY(16px);
+      background: rgba(45, 38, 39, 0.94);
+      color: #FFFFFF;
+      padding: 10px 16px;
+      border-radius: 999px;
+      font-size: 12.5px;
+      font-weight: 700;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.24s ease;
+      z-index: 200;
+      white-space: nowrap;
+      max-width: 92vw;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.24);
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 스마트폰 메신저 앱 프레임 -->
+  <main class="phone-frame" role="application" aria-label="변연시 - 변우석 연애 시뮬레이션">
+    <div class="views-container">
+
+      <!-- ====================================================================
+           VIEW 1: 로비 (Lobby & 5 Episode Cards)
+           ==================================================================== -->
+      <section id="viewLobby" class="view-panel active" aria-label="로비">
+        <div class="scroll-body lobby-scroll">
+          <div class="lobby-topbar">
+            <div class="brand-lockup">
+              <span class="brand-title">변연시</span>
+              <span class="brand-sub">변우석 연애 시뮬레이션</span>
+            </div>
+            <div class="lobby-actions">
+              <button class="icon-btn js-sound-toggle" type="button" title="효과음 켜기/끄기" aria-label="효과음 전환">🔊</button>
+              <button class="icon-btn js-open-dev" type="button" title="개발자 도구" aria-label="개발자 도구 열기">🛠️</button>
+            </div>
+          </div>
+
+          <!-- 히어로 프로필 카드 -->
+          <div class="hero-card">
+            <div class="hero-profile-row">
+              <div class="hero-avatar-ring">
+                <img id="lobbyHeroAvatar" class="hero-avatar-img" alt="변우석 프로필" />
+              </div>
+              <div class="hero-info">
+                <div id="lobbyRelBadge" class="hero-rel-badge">💌 설렘의 시작</div>
+                <div class="hero-char-name">
+                  <span id="lobbyCharName">변우석</span>
+                  <span class="verified-badge" title="공식 페르소나">✓</span>
+                </div>
+                <p id="lobbyCharStatus" class="hero-tagline">촬영 대기 중 ✨ 오늘도 보고 싶다</p>
+              </div>
+            </div>
+
+            <div class="hero-stats-box">
+              <div class="hero-affinity-row">
+                <span class="heart-txt">♥ 현재 호감도</span>
+                <span id="lobbyAffinityText">15 / 100</span>
+              </div>
+              <div class="hero-track">
+                <div id="lobbyAffinityFill" class="hero-fill"></div>
+              </div>
+              <div class="hero-pills">
+                <div class="hero-pill">🎬 쇼츠 앨범 <strong id="lobbyShortsCount">0 / 5</strong></div>
+                <div class="hero-pill">💍 엔딩 도감 <strong id="lobbyEndingsCount">0 / 3</strong></div>
+              </div>
+            </div>
+
+            <div class="hero-cta-row">
+              <button id="btnLobbyContinue" type="button" class="btn-hero-primary">EP.1 시작하기 ▶</button>
+              <button id="btnLobbyNewGame" type="button" class="btn-hero-secondary">처음부터 시작</button>
+            </div>
+          </div>
+
+          <!-- 5개 에피소드 선택 리스트 -->
+          <div class="section-heading">
+            <h2>✨ 쇼츠 테마 에피소드 (5부작)</h2>
+            <span>자유 선택 · 순차 플레이</span>
+          </div>
+          <div id="lobbyEpisodeList" class="episode-list"></div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           VIEW 2: 채팅 (Messenger Dating Simulation)
+           ==================================================================== -->
+      <section id="viewChat" class="view-panel" aria-label="채팅">
+        <header class="chat-header">
+          <div class="header-top">
+            <div class="profile-group">
+              <div class="avatar-wrap">
+                <img id="chatHeaderAvatar" class="avatar-img" alt="변우석" />
+                <span class="online-dot" aria-hidden="true"></span>
+              </div>
+              <div class="profile-meta">
+                <div class="char-name-row">
+                  <span id="chatCharName" class="char-name">변우석</span>
+                  <span class="verified-badge">✓</span>
+                  <span id="chatEpChip" class="ep-chip-mini">EP.1</span>
+                </div>
+                <div id="chatCharStatus" class="char-status">촬영 대기 중 ✨ 오늘도 보고 싶다</div>
+              </div>
+            </div>
+
+            <div class="header-actions">
+              <button class="icon-btn js-sound-toggle" type="button" title="효과음 켜기/끄기" aria-label="효과음 전환">🔊</button>
+              <button class="icon-btn js-open-dev" type="button" title="개발자 상태창" aria-label="개발자 상태창 열기">🛠️</button>
+              <button id="btnChatReset" class="icon-btn" type="button" title="초기화" aria-label="게임 초기화">↺</button>
+            </div>
+          </div>
+
+          <div class="affinity-bar-wrap" id="affinityWrap">
+            <span class="affinity-label">
+              <span id="affinityHeart" class="affinity-heart-icon">♥</span>
+              <span>호감도</span>
+            </span>
+            <div class="affinity-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="15" id="affinityProgress">
+              <div id="affinityFill" class="affinity-fill"></div>
+            </div>
+            <span id="affinityScore" class="affinity-score">15 / 100</span>
+          </div>
+        </header>
+
+        <div id="chatMessages" class="chat-messages scroll-body" aria-live="polite"></div>
+
+        <div id="interactionArea" class="interaction-area">
+          <div class="waiting-bar">
+            <span>대화를 준비하는 중...</span>
+            <span class="waiting-bar-send">↑</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           VIEW 3: 갤러리 (5종 쇼츠 앨범 & 3종 엔딩 도감)
+           ==================================================================== -->
+      <section id="viewGallery" class="view-panel" aria-label="갤러리">
+        <header class="gallery-header">
+          <h1>🎞️ 쇼츠 앨범 &amp; 엔딩 도감</h1>
+          <div class="lobby-actions">
+            <button class="icon-btn js-open-dev" type="button" title="개발자 도구">🛠️</button>
+          </div>
+        </header>
+
+        <div class="scroll-body gallery-scroll">
+          <div class="section-heading">
+            <h2>📱 수집한 변우석 쇼츠</h2>
+            <span id="galleryShortsProgress">0 / 5 해금됨</span>
+          </div>
+          <div id="galleryShortsGrid" class="shorts-grid"></div>
+
+          <div class="section-heading">
+            <h2>💐 엔딩 컬렉션</h2>
+            <span id="galleryEndingsProgress">0 / 3 수집됨</span>
+          </div>
+          <div id="galleryEndingsList" class="ending-dex-list"></div>
+        </div>
+      </section>
+    </div>
+
+    <!-- 하단 3단 탭 네비게이션 -->
+    <nav class="bottom-nav" aria-label="메인 메뉴">
+      <button type="button" class="nav-tab-btn active" data-view="lobby">
+        <span class="tab-icon">🏠</span>
+        <span class="tab-label">로비</span>
+      </button>
+      <button type="button" class="nav-tab-btn" data-view="chat">
+        <span class="tab-icon">💬</span>
+        <span class="tab-label">채팅</span>
+      </button>
+      <button type="button" class="nav-tab-btn" data-view="gallery">
+        <span class="tab-icon">🎞️</span>
+        <span class="tab-label">갤러리</span>
+        <span id="galleryUnreadDot" class="nav-badge-dot"></span>
+      </button>
+    </nav>
+  </main>
+
+  <!-- ====================================================================
+       MODAL 1: 9:16 유튜브 쇼츠 인앱 라이트박스 플레이어
+       ==================================================================== -->
+  <div id="shortsModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="shortsModalTitle">
+    <div class="shorts-modal-shell">
+      <div class="shorts-modal-head">
+        <div class="shorts-modal-title-wrap">
+          <div id="shortsModalTag" class="shorts-modal-tag">EP.1</div>
+          <div id="shortsModalTitle" class="shorts-modal-title">쇼츠 재생</div>
+        </div>
+        <button type="button" id="btnCloseShortsModal" class="shorts-modal-close" aria-label="닫기">×</button>
+      </div>
+      <!-- 열릴 때만 iframe을 마운트하고 닫힐 때 즉시 파괴하여 소리 완전 정지 -->
+      <div id="shortsIframeStage" class="shorts-iframe-stage"></div>
+      <div class="shorts-modal-foot">
+        <p id="shortsModalNote" class="shorts-modal-note"></p>
+        <a id="shortsExtLink" class="shorts-ext-link" href="#" target="_blank" rel="noopener noreferrer">
+          유튜브에서 직접 열기 ↗
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       MODAL 2: 포토 카드 확대 라이트박스
+       ==================================================================== -->
+  <div id="photoModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="photoModalCaption">
+    <div class="photo-modal-card">
+      <img id="photoModalImg" class="photo-modal-img" alt="확대 사진" />
+      <div class="photo-modal-body">
+        <p id="photoModalCaption" class="photo-modal-caption"></p>
+        <div class="modal-action-row" style="margin-top: 0;">
+          <button type="button" class="btn-secondary" data-close-modal="photoModal">닫기</button>
+          <button type="button" id="btnPhotoWatchShort" class="btn-primary">관련 쇼츠 보기 ▶</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       MODAL 3: 개발자 상태창 & 시나리오 점프 툴
+       ==================================================================== -->
+  <div id="devModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="devModalTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 id="devModalTitle" class="modal-title">🛠️ 변연시 개발자 상태창</h2>
+        <button class="modal-close-btn" type="button" data-close-modal="devModal" aria-label="닫기">×</button>
+      </div>
+
+      <div class="dev-section">
+        <div class="dev-section-title">현재 진행 상태</div>
+        <div class="dev-box">
+          <div class="dev-row" style="margin-bottom: 8px;">
+            <span>에피소드 / 노드</span>
+            <span id="devCurrentNode" class="dev-code-pill">EP.1 · ep1_start</span>
+          </div>
+          <div class="dev-row">
+            <span>타이핑 연출 속도</span>
+            <div class="dev-btn-group" style="margin-top: 0;">
+              <button type="button" class="dev-mini-btn" id="btnSpeedNormal">1x 기본</button>
+              <button type="button" class="dev-mini-btn" id="btnSpeedFast">5x 고속</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dev-section">
+        <div class="dev-section-title">호감도 조절 (<span id="devAffinityVal">15</span> / 100)</div>
+        <div class="dev-box">
+          <input type="range" id="devAffinitySlider" class="dev-slider" min="0" max="100" value="15" />
+          <div class="dev-btn-group">
+            <button type="button" class="dev-mini-btn" data-affinity-delta="-15">-15</button>
+            <button type="button" class="dev-mini-btn" data-affinity-delta="-5">-5</button>
+            <button type="button" class="dev-mini-btn" data-affinity-delta="10">+10</button>
+            <button type="button" class="dev-mini-btn" data-affinity-delta="25">+25</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="dev-section">
+        <div class="dev-section-title">에피소드 / 노드 즉시 점프</div>
+        <div class="dev-box">
+          <select id="devNodeSelect" class="dev-select" aria-label="시나리오 노드 선택"></select>
+          <div class="dev-btn-group">
+            <button type="button" id="btnDevJumpNode" class="dev-mini-btn" style="flex: 1;">선택 노드로 점프</button>
+            <button type="button" id="btnDevUnlockGallery" class="dev-mini-btn" style="flex: 1;">갤러리 전체 해금</button>
+          </div>
+          <div class="dev-btn-group" style="margin-top: 8px;">
+            <button type="button" class="dev-mini-btn js-quick-jump" data-jump="ep2_start">EP.2 남친모드 확장</button>
+            <button type="button" class="dev-mini-btn js-quick-jump" data-jump="ep3_start">EP.3 BAZAAR NEW</button>
+            <button type="button" class="dev-mini-btn js-quick-jump" data-jump="ep5_start">EP.5 고백 엔딩</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="dev-section">
+        <div class="dev-section-title">획득한 분기 플래그 (Flags)</div>
+        <div class="dev-box">
+          <div id="devFlagsList" class="flag-chip-list"></div>
+        </div>
+      </div>
+
+      <div class="dev-section" style="margin-bottom: 0;">
+        <div class="dev-section-title">저장 데이터 관리</div>
+        <div class="modal-action-row" style="margin-top: 6px;">
+          <button type="button" id="btnDevSoftReset" class="btn-secondary">대화만 초기화</button>
+          <button type="button" id="btnDevHardReset" class="btn-danger">완전 초기화</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       MODAL 4: 초기화 확인 모달 (alert / confirm 미사용)
+       ==================================================================== -->
+  <div id="resetModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="resetModalTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 id="resetModalTitle" class="modal-title">처음부터 다시 시작할까요?</h2>
+        <button class="modal-close-btn" type="button" data-close-modal="resetModal" aria-label="닫기">×</button>
+      </div>
+      <p style="font-size: 13px; line-height: 1.62; color: var(--text-sub);">
+        현재 진행 중인 대화와 호감도, 분기 플래그가 처음 상태로 초기화됩니다.<br />
+        <strong>새 게임 시작</strong>을 누르면 수집한 5종 쇼츠 앨범과 엔딩 도감은 그대로 유지됩니다!
+      </p>
+      <div class="modal-action-row">
+        <button type="button" class="btn-secondary" data-close-modal="resetModal">취소</button>
+        <button type="button" id="btnConfirmSoftReset" class="btn-primary">새 게임 시작</button>
+      </div>
+      <div class="modal-action-row" style="margin-top: 8px;">
+        <button type="button" id="btnConfirmHardReset" class="btn-danger">앨범·엔딩까지 완전 초기화</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 토스트 알림 -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    /* ==========================================================================
+       [섹션 1] CHARACTER_CONFIG — 캐릭터 프로필 & 테마 데이터 주도 설정
+       ========================================================================== */
+    const CHARACTER_CONFIG = {
+      name: "변우석",
+      statusMessage: "촬영 대기 중 ✨ 오늘도 보고 싶다",
+      avatarUrl: "https://i.ytimg.com/vi/vPeiPH3hc2Y/hqdefault.jpg",
+      avatarFallbackUrl: "https://i.ytimg.com/vi/vPeiPH3hc2Y/mqdefault.jpg",
+      theme: {
+        primary: "#F67280",
+        cream: "#FFF8F6",
+        text: "#2D2627"
+      },
+      initialAffinity: 15,
+      minAffinity: 0,
+      maxAffinity: 100,
+      statusTyping: "메시지를 입력 중...",
+      episodeStatus: {
+        ep1: "수영장 화보 쉬는 시간 · 브런치 중 🍞",
+        ep2: "서울 팬미팅 대기실 · 남친모드 연습 중 💬",
+        ep3: "BAZAAR 촬영 현장 · 컷 소리 후 잔망 폭발 ✨",
+        ep4: "늦은 밤 · 푸르른 청춘을 떠올리는 중 📖",
+        ep5: "블랙 셔츠 촬영 직후 · 두근거리는 밤 🖤"
+      }
+    };
+
+    /* ==========================================================================
+       [섹션 2] SHORTS_CATALOG — 5개 유튜브 쇼츠 중앙 레지스트리
+       - id, title, tag, channel, episodeId, thumbnailUrl, fallbackThumb, directUrl
+       ========================================================================== */
+    const SHORTS_CATALOG = {
+      WtDv3Zh5WbM: {
+        id: "WtDv3Zh5WbM",
+        title: "왕자님의 휴일 같은 화보 현장 💗",
+        tag: "EP.1 · 왕자님의 휴일",
+        channel: "ELLE KOREA · 불가리",
+        episodeId: "ep1",
+        thumbnailUrl: "https://i.ytimg.com/vi/WtDv3Zh5WbM/hqdefault.jpg",
+        fallbackThumb: "https://i.ytimg.com/vi/WtDv3Zh5WbM/mqdefault.jpg",
+        directUrl: "https://youtube.com/shorts/WtDv3Zh5WbM",
+        sceneNote: "햇살 가득한 수영장 옆 화보 촬영 쉬는 시간. 빨간 니트 토스트 브런치와 필름 카메라의 여유로운 순간."
+      },
+      P4wBkideNng: {
+        id: "P4wBkideNng",
+        title: "변우석이 말아주는 상황극 (남친모드) 💬",
+        tag: "EP.2 · 남친모드 확장",
+        channel: "서울 팬미팅 · 확장판",
+        episodeId: "ep2",
+        thumbnailUrl: "https://i.ytimg.com/vi/P4wBkideNng/hqdefault.jpg",
+        fallbackThumb: "https://i.ytimg.com/vi/P4wBkideNng/mqdefault.jpg",
+        directUrl: "https://youtube.com/shorts/P4wBkideNng",
+        sceneNote: "회식 질투부터 단호한 '안 끝났어, 앉아'와 전설의 '여기 야가 어딨어... 야'까지 담긴 남친모드 상황극!"
+      },
+      "4ArZZ-qgbiY": {
+        id: "4ArZZ-qgbiY",
+        title: "온 세상이 자꾸 변우석 하는 이유 ✨",
+        tag: "EP.3 · BAZAAR NEW",
+        channel: "Harper's BAZAAR Korea · NEW!",
+        episodeId: "ep3",
+        thumbnailUrl: "https://i.ytimg.com/vi/4ArZZ-qgbiY/hqdefault.jpg",
+        fallbackThumb: "https://i.ytimg.com/vi/4ArZZ-qgbiY/mqdefault.jpg",
+        directUrl: "https://youtube.com/shorts/4ArZZ-qgbiY",
+        sceneNote: "카메라 앞 카리스마 넘치는 프로페셔널함에서 컷 소리와 함께 터지는 잔망미 가득한 반전 미소 비하인드!"
+      },
+      "YG9G-Rl-M6E": {
+        id: "YG9G-Rl-M6E",
+        title: "푸르른 봄, 우리의 청춘 📖",
+        tag: "EP.4 · 감성 보이스노트",
+        channel: "BAZAAR 잡학사전",
+        episodeId: "ep4",
+        thumbnailUrl: "https://i.ytimg.com/vi/YG9G-Rl-M6E/hqdefault.jpg",
+        fallbackThumb: "https://i.ytimg.com/vi/YG9G-Rl-M6E/mqdefault.jpg",
+        directUrl: "https://youtube.com/shorts/YG9G-Rl-M6E",
+        sceneNote: "꽃피는 푸르른 봄, 일생에 단 한 번뿐이라는 청춘을 담담하고 따뜻하게 읊어주는 감성 클립."
+      },
+      vPeiPH3hc2Y: {
+        id: "vPeiPH3hc2Y",
+        title: "두근거리는 블랙 셔츠 고백 🖤",
+        tag: "EP.5 · 블랙 셔츠 고백",
+        channel: "BAZAAR · 까르띠에",
+        episodeId: "ep5",
+        thumbnailUrl: "https://i.ytimg.com/vi/vPeiPH3hc2Y/hqdefault.jpg",
+        fallbackThumb: "https://i.ytimg.com/vi/vPeiPH3hc2Y/mqdefault.jpg",
+        directUrl: "https://youtube.com/shorts/vPeiPH3hc2Y",
+        sceneNote: "블랙 셔츠 까르띠에 화보를 마친 밤, 두근거리는 진심을 담아 미소 짓는 고백의 순간."
+      }
+    };
+
+    /* ==========================================================================
+       [섹션 3] EPISODES (5부작) & ENDINGS_META (3종 멀티 엔딩)
+       ========================================================================== */
+    const EPISODES = [
+      {
+        id: "ep1",
+        code: "EP.1",
+        title: "왕자님의 휴일",
+        subtitle: "수영장 화보 쉬는 시간, 빨간 니트 토스트 브런치와 필름 카메라",
+        startNode: "ep1_start",
+        shortsId: "WtDv3Zh5WbM",
+        badge: null
+      },
+      {
+        id: "ep2",
+        code: "EP.2",
+        title: "남친모드 상황극 [확장판]",
+        subtitle: "회식 질투부터 '여기 야가 어딨어... 야'까지 2라운드 심쿵 상황극",
+        startNode: "ep2_start",
+        shortsId: "P4wBkideNng",
+        badge: { text: "확장", type: "expanded" }
+      },
+      {
+        id: "ep3",
+        code: "EP.3",
+        title: "온 세상이 변우석 하는 이유",
+        subtitle: "바자 화보 촬영장, 컷 소리와 함께 폭발하는 반전 잔망미 비하인드",
+        startNode: "ep3_start",
+        shortsId: "4ArZZ-qgbiY",
+        badge: { text: "NEW", type: "new" }
+      },
+      {
+        id: "ep4",
+        code: "EP.4",
+        title: "푸르른 봄, 우리의 청춘",
+        subtitle: "늦은 밤 도착한 감성 보이스노트와 영원히 간직할 봄의 약속",
+        startNode: "ep4_start",
+        shortsId: "YG9G-Rl-M6E",
+        badge: null
+      },
+      {
+        id: "ep5",
+        code: "EP.5",
+        title: "두근거리는 고백",
+        subtitle: "블랙 셔츠 까르띠에 촬영을 마친 밤, 진심을 전하는 마지막 선택",
+        startNode: "ep5_start",
+        shortsId: "vPeiPH3hc2Y",
+        badge: null
+      }
+    ];
+
+    const ENDINGS_META = {
+      ending_happy: {
+        id: "ending_happy",
+        grade: "HAPPY",
+        rankLabel: "TRUE HAPPY ENDING 💖",
+        icon: "💐",
+        title: "푸르른 봄의 연인",
+        hint: "호감도 65+ (또는 호감도 55+ & 봄의 약속 플래그) 달성",
+        shortsId: "vPeiPH3hc2Y",
+        description: "휴일의 브런치와 수줍은 남친모드, 촬영장 컷 뒤의 비밀 미소, 그리고 밤의 청춘 약속까지. 수많은 계절이 흘러도 변하지 않을 두 사람만의 푸르른 봄이 오늘부터 공식적으로 시작되었습니다."
+      },
+      ending_normal: {
+        id: "ending_normal",
+        grade: "NORMAL",
+        rankLabel: "NORMAL ENDING 🌸",
+        icon: "🌷",
+        title: "설렘이 시작된 우리",
+        hint: "호감도 35 ~ 64 구간으로 EP.5 완료",
+        shortsId: "YG9G-Rl-M6E",
+        description: "아직은 조금 조심스럽고 쑥스러운 거리지만, 서로의 메시지를 기다릴 때마다 미소가 번지는 기분 좋은 썸의 시작. 다음 데이트에서는 분명 더 가까워질 거예요."
+      },
+      ending_bad: {
+        id: "ending_bad",
+        grade: "BAD",
+        rankLabel: "BAD ENDING 🌧️",
+        icon: "🎞️",
+        title: "화보 속 멀어진 뒷모습",
+        hint: "호감도 35 미만 또는 고백을 거절하는 선택",
+        shortsId: "WtDv3Zh5WbM",
+        description: "너무 가까이 다가가기엔 눈부셨던 걸까. 짧고 찬란했던 설렘은 아름다운 화보 한 장면처럼 휴대폰 화면 속에만 남아 조용히 막을 내렸습니다."
+      }
+    };
+
+    /* ==========================================================================
+       [섹션 4] SCENARIOS — 5개 에피소드 노드 그래프
+       - 메시지 타입: date | narration | text | photo | shorts | voice
+       ========================================================================== */
+    const SCENARIOS = {
+      /* ========================================================================
+         EP.1 [왕자님의 휴일] — WtDv3Zh5WbM
+         ======================================================================== */
+      ep1_start: {
+        episodeId: "ep1",
+        messages: [
+          { type: "date", text: "EP.1 · 왕자님의 휴일 (햇살 가득한 주말 오전)" },
+          {
+            type: "narration",
+            text: "눈부신 햇살이 창가를 채운 주말 아침. 수영장 화보 촬영 중간 쉬는 시간을 맞은 변우석에게서 사진 한 장과 메시지가 도착했다.",
+            delay: 820
+          },
+          {
+            type: "photo",
+            shortsId: "WtDv3Zh5WbM",
+            caption: "빨간 니트 입고 수영장 옆 토스트 브런치 타임 🍞☀️",
+            delay: 1050,
+            time: "오전 10:12"
+          },
+          {
+            type: "text",
+            text: "잘 잤어? 난 지금 수영장 화보 잠깐 쉬는 시간이라 아침 겸 브런치 먹는 중이야 ㅎㅎ",
+            delay: 1100,
+            time: "오전 10:12"
+          },
+          {
+            type: "text",
+            text: "토스트 한 입 베어 물다가 갑자기 네 생각나서 바로 찍어봤어. 너는 아침 챙겨 먹었어?",
+            delay: 1200,
+            time: "오전 10:13"
+          }
+        ],
+        choices: [
+          {
+            text: "토스트 한 입 문 게 왜 그대로 화보예요?! 진짜 왕자님의 휴일 같아 💗",
+            replyText: "아니 토스트 한 입 베어 문 게 왜 그대로 화보가 되는 거예요?! 진짜 왕자님의 휴일 같다 💗",
+            next: "ep1_mid_camera",
+            affinity: 10
+          },
+          {
+            text: "빨간 니트랑 햇살 조합 반칙이에요! 나도 거기 옆자리에서 같이 먹고 싶다~",
+            replyText: "빨간 니트에 햇살 조합 반칙 아니에요? 저 아직 안 먹었는데 옆자리 비어있으면 같이 햇살 쬐고 싶어요 ☀️",
+            next: "ep1_mid_camera",
+            affinity: 9
+          },
+          {
+            text: "촬영 힘들 텐데 든든하게 먹어요! 밥은 챙겨 먹어야죠.",
+            replyText: "화보 촬영하느라 고생 많네요! 빵만 먹지 말고 든든하게 챙겨 먹어요 ㅎㅎ",
+            next: "ep1_mid_camera",
+            affinity: 6
+          }
+        ]
+      },
+
+      ep1_mid_camera: {
+        episodeId: "ep1",
+        messages: [
+          {
+            type: "text",
+            text: "에이 ㅋㅋ 그렇게 말해 주니까 아침부터 기분 확 좋아지잖아 😆",
+            delay: 1050,
+            time: "오전 10:15"
+          },
+          {
+            type: "narration",
+            text: "잠시 뒤, 쉬는 시간을 틈타 잠깐 들른 테라스에서 우석이 클래식 필름 카메라를 들고 햇살 아래 환하게 웃으며 내 쪽으로 렌즈를 향한다.",
+            delay: 950
+          },
+          {
+            type: "shorts",
+            shortsId: "WtDv3Zh5WbM",
+            delay: 1050,
+            time: "오전 11:20"
+          },
+          {
+            type: "text",
+            text: "방금 현장 비하인드 숏츠도 받았는데 너한테 먼저 보냈어! 자, 이번엔 내가 직접 필름 카메라로 너 찍어줄게. 웃어봐, 찰칵—!",
+            delay: 1300,
+            time: "오전 11:21"
+          }
+        ],
+        choices: [
+          {
+            text: "브이하며 웃기: 필름 인화하면 제일 먼저 나한테 보여주기 약속해요 📷",
+            replyText: "앗, 방금 찍혔어?! 필름 인화하면 제일 먼저 나한테 보여주기 약속해요 📷✨",
+            next: "ep1_clear",
+            affinity: 10,
+            setFlag: "took_photo"
+          },
+          {
+            text: "카메라 뺏어 들기: 저만 찍히면 억울해요! 제가 우석님 인생샷 찍어줄래요!",
+            replyText: "저만 찍히면 억울하죠! 카메라 잠깐만 줘봐요, 수영장 배경으로 인생샷 남겨드릴게요 😉",
+            next: "ep1_clear",
+            affinity: 8,
+            setFlag: "took_photo"
+          },
+          {
+            text: "수줍게 손으로 가리기: 카메라 앞은 아직 어색해요... 풍경만 찍어요!",
+            replyText: "저 사진 찍히는 거 아직 어색해서 얼어붙어요 ㅠㅠ 그냥 수영장 햇살만 찍어요!",
+            next: "ep1_clear",
+            affinity: 3
+          }
+        ]
+      },
+
+      ep1_clear: {
+        episodeId: "ep1",
+        messages: [
+          {
+            type: "text",
+            text: "오늘 모처럼 진짜 휴일처럼 편하게 웃었네. 너랑 얘기하면 시간 가는 줄 모르겠어 ☀️",
+            delay: 1150,
+            time: "오후 1:10"
+          },
+          {
+            type: "text",
+            text: "맞다! 내일 서울 팬미팅에서 '남친모드 상황극' 코너를 하게 됐는데... 이따 채팅으로 나랑 미리 연습 좀 해줄래? 💬",
+            delay: 1250,
+            time: "오후 1:11"
+          }
+        ],
+        nextEpisode: {
+          epTitle: "EP.1 왕자님의 휴일 클리어!",
+          desc: "수영장 브런치와 필름 카메라의 추억이 쌓였습니다. 이제 팬미팅 '남친모드 상황극' 확장판이 기다리는 EP.2로 이어집니다!",
+          nextEpId: "ep2",
+          nextNodeId: "ep2_start",
+          nextButtonText: "EP.2 남친모드 상황극 [확장] ▶"
+        }
+      },
+
+      /* ========================================================================
+         EP.2 [남친모드 상황극 확장판] — P4wBkideNng
+         - Branch 1: 회식 질투 상황극 ("회식 안 가면 안 돼? 아 거기 남자 있잖아...")
+         - Branch 2: 단호한 남친 / 삐짐 상황극 ("안 끝났어, 어? 앉아." -> "야라고 하지 마! 여기 야가 어딨어... 야.")
+         ======================================================================== */
+      ep2_start: {
+        episodeId: "ep2",
+        messages: [
+          { type: "date", text: "EP.2 · 남친모드 상황극 [확장판] (팬미팅 대기실)" },
+          {
+            type: "narration",
+            text: "화사한 핑크 니트를 입고 서울 팬미팅 대기실에 앉아 있는 변우석. 대본을 만지작거리며 수줍고 장난기 어린 메시지를 보내온다.",
+            delay: 850
+          },
+          {
+            type: "text",
+            text: "나 지금 팬미팅 대기실이야! 이따 무대에서 '남친모드 상황극'을 해야 하는데 혼자 연습하려니까 너무 오글거려서 못 하겠어 🙈",
+            delay: 1250,
+            time: "오후 6:40"
+          },
+          {
+            type: "text",
+            text: "네가 상대역 좀 해줄래? 먼저 1라운드 '회식 질투하는 남친'부터 갈게! 준비됐지? 시작한다—!",
+            delay: 1300,
+            time: "오후 6:41"
+          }
+        ],
+        autoNext: "ep2_branch1_jealous"
+      },
+
+      /* EP.2 Branch 1: 회식 질투 상황극 */
+      ep2_branch1_jealous: {
+        episodeId: "ep2",
+        messages: [
+          {
+            type: "narration",
+            text: "우석이 잠깐 호흡을 가다듬더니, 금세 입술을 삐죽 내민 듯한 애교 섞인 질투 모드로 돌입한다.",
+            delay: 850
+          },
+          {
+            type: "text",
+            text: "회식 안 가면 안 돼? 아 거기 남자 있잖아...",
+            delay: 1250,
+            time: "오후 6:42"
+          },
+          {
+            type: "text",
+            text: "나 오늘 하루 종일 너만 기다렸단 말이야. 다른 사람이랑 웃으면서 밥 먹는 거 생각만 해도 싫은데… 그냥 나랑 있으면 안 돼? 🥺",
+            delay: 1350,
+            time: "오후 6:42"
+          }
+        ],
+        choices: [
+          {
+            text: "달달하게 안심시키기: 당연하지! 회식 취소하고 지금 바로 너한테 갈게 💕",
+            replyText: "하… 그렇게 말하면 어떻게 가! 알았어, 회식 취소하고 지금 바로 너한테 달려갈게 💕",
+            next: "ep2_b1_sweet",
+            affinity: 10
+          },
+          {
+            text: "장난스럽게 놀리기: 어머, 질투하는 거 귀엽네? 나 회식 갈 건데 우리 헤어질까? 😜",
+            replyText: "어머, 질투하는 거 왜 이렇게 귀여워? 근데 나 회식 꼭 가야 하는데… 그럼 우리 그냥 헤어질까? 😜",
+            next: "ep2_b1_tease",
+            affinity: 9
+          },
+          {
+            text: "현실적으로 달래기: 일 때문에 가는 건데 어쩔 수 없지~ 끝나고 바로 전화할게!",
+            replyText: "에이, 일 때문에 가는 회식인데 어쩔 수 없지~ 술 안 마시고 끝나자마자 바로 전화할게!",
+            next: "ep2_b1_calm",
+            affinity: 6
+          }
+        ]
+      },
+
+      ep2_b1_sweet: {
+        episodeId: "ep2",
+        messages: [
+          {
+            type: "text",
+            text: "진짜?! ㅋㅋ 아 잠깐, 내가 상황극인데 진짜로 심쿵해 버렸네 😳",
+            delay: 1150,
+            time: "오후 6:44"
+          },
+          {
+            type: "text",
+            text: "좋아, 너 호흡 진짜 잘 맞춘다! 그럼 이어서 2라운드는 좀 더 단호하고 삐진 남친 버전으로 해볼게. 이번엔 장난치면 안 돼!",
+            delay: 1300,
+            time: "오후 6:45"
+          }
+        ],
+        autoNext: "ep2_branch2_strict"
+      },
+
+      ep2_b1_tease: {
+        episodeId: "ep2",
+        messages: [
+          {
+            type: "text",
+            text: "뭐? 지금 헤어지자고 했어?! 좋아, 마침 2라운드 대본이랑 완벽하게 이어지네 🔥",
+            delay: 1150,
+            time: "오후 6:44"
+          },
+          {
+            type: "text",
+            text: "이번엔 단호한 남친 버전 간다! 단단히 각오해—",
+            delay: 1150,
+            time: "오후 6:45"
+          }
+        ],
+        autoNext: "ep2_branch2_strict"
+      },
+
+      ep2_b1_calm: {
+        episodeId: "ep2",
+        messages: [
+          {
+            type: "text",
+            text: "흥, 그렇게 어른스럽게 달래면 삐질 수가 없잖아 ㅎㅎ",
+            delay: 1100,
+            time: "오후 6:44"
+          },
+          {
+            type: "text",
+            text: "그럼 2라운드는 내가 제대로 단호하게 삐진 남친 컨셉 해볼게! 잘 받아쳐 줘!",
+            delay: 1200,
+            time: "오후 6:45"
+          }
+        ],
+        autoNext: "ep2_branch2_strict"
+      },
+
+      /* EP.2 Branch 2: 단호한 남친 / 삐짐 상황극 (아이코닉 대사 구현) */
+      ep2_branch2_strict: {
+        episodeId: "ep2",
+        messages: [
+          {
+            type: "narration",
+            text: "장난기 있던 공기가 순식간에 진지해진다. 낮고 단호한 목소리가 귓가에 울리는 듯한 메시지가 도착한다.",
+            delay: 900
+          },
+          {
+            type: "text",
+            text: "안 끝났어, 어? 앉아.",
+            delay: 1250,
+            time: "오후 6:46"
+          },
+          {
+            type: "text",
+            text: "네 마음대로 얘기 끝내고 일어나면 다야? 지금 내 눈 똑바로 보고 말해.",
+            delay: 1300,
+            time: "오후 6:46"
+          }
+        ],
+        choices: [
+          {
+            text: "장난기 발동해 반말하기: \"야! 너 지금 나한테 명령하는 거야?!\"",
+            replyText: "야! 너 지금 나한테 명령하는 거야?! 그렇게 무섭게 말하면 내가 들을 줄 알아?! 😤",
+            next: "ep2_b2_iconic",
+            affinity: 12,
+            setFlag: "roleplay_master"
+          },
+          {
+            text: "심쿵해서 순순히 앉기: \"알았어, 앉을게… 화 풀고 천천히 말해 봐.\"",
+            replyText: "잠깐만 방금 박력에 심장 떨어질 뻔… 알았어, 앉을게! 화 풀고 천천히 얘기해 봐 😳",
+            next: "ep2_b2_iconic_soft",
+            affinity: 9,
+            setFlag: "roleplay_master"
+          },
+          {
+            text: "웃음 터져 상황극 중단: \"ㅋㅋㅋ 미안, 너무 진지해서 웃음 터졌어!\"",
+            replyText: "ㅋㅋㅋ 미안, 평소랑 너무 다른 단호한 말투라 상상하니까 웃음 터졌어!",
+            next: "ep2_b2_laugh",
+            affinity: 4
+          }
+        ]
+      },
+
+      ep2_b2_iconic: {
+        episodeId: "ep2",
+        messages: [
+          {
+            type: "text",
+            text: "야라고 하지 마! 여기 야가 어딨어... 야.",
+            delay: 1300,
+            time: "오후 6:47"
+          },
+          {
+            type: "narration",
+            text: "단호하게 대사를 치던 우석이 마지막 '...야.'에서 스스로 터져버렸는지, 3초 만에 현실 말투로 급전환한다.",
+            delay: 950
+          },
+          {
+            type: "text",
+            text: "아 이거 진짜 부끄럽네ㅋㅋ 귀까지 다 빨개졌어 🙈🔥 방금 팬미팅 리허설 때 영상 찍어둔 거 보낼게!",
+            delay: 1350,
+            time: "오후 6:48"
+          },
+          {
+            type: "shorts",
+            shortsId: "P4wBkideNng",
+            delay: 1050,
+            time: "오후 6:48"
+          }
+        ],
+        choices: [
+          {
+            text: "레전드 인증: '여기 야가 어딨어... 야' 진짜 유죄예요!! 백 번 돌려볼래요 💖",
+            replyText: "아니 '여기 야가 어딨어... 야' 진짜 유죄 아니에요?! 방금 영상 백 번 돌려볼래요 💖",
+            next: "ep2_clear",
+            affinity: 8
+          },
+          {
+            text: "본체 놀리기: 상황극 끝나고 귀 빨개지는 본체가 제일 남친미 넘쳐요 ㅋㅋ",
+            replyText: "상황극도 대박인데 끝나자마자 부끄러워하는 지금 본체가 제일 심쿵이에요 ㅋㅋ",
+            next: "ep2_clear",
+            affinity: 7
+          }
+        ]
+      },
+
+      ep2_b2_iconic_soft: {
+        episodeId: "ep2",
+        messages: [
+          {
+            type: "text",
+            text: "사실 뒤 대사가 '야라고 하지 마! 여기 야가 어딨어... 야.'였는데 네가 너무 착하게 앉아줘서 말문이 막혔어 ㅎㅎ",
+            delay: 1300,
+            time: "오후 6:47"
+          },
+          {
+            type: "text",
+            text: "아 이거 진짜 부끄럽네ㅋㅋ 방금 영상 찍어둔 거 보낼게! 무대 버전이랑 비교해 봐 🙈",
+            delay: 1250,
+            time: "오후 6:48"
+          },
+          {
+            type: "shorts",
+            shortsId: "P4wBkideNng",
+            delay: 1050,
+            time: "오후 6:48"
+          }
+        ],
+        choices: [
+          {
+            text: "영상 보고 감탄: 무대 위에서도 이렇게 다정하면 팬분들 쓰러지겠어요!",
+            replyText: "영상 보니까 진짜 미치겠네 ㅋㅋㅋ 무대 위에서도 이렇게 설레면 다들 심장 남아나겠어요?!",
+            next: "ep2_clear",
+            affinity: 7
+          },
+          {
+            text: "나만의 특권: 그래도 나한테 1:1로 먼저 해준 게 제일 좋았어요 💕",
+            replyText: "영상도 레전드지만 그래도 나한테 1:1로 먼저 연습해 준 게 제일 설렜어요 💕",
+            next: "ep2_clear",
+            affinity: 8
+          }
+        ]
+      },
+
+      ep2_b2_laugh: {
+        episodeId: "ep2",
+        messages: [
+          {
+            type: "text",
+            text: "야! 웃지 말라니까 ㅋㅋ '야라고 하지 마! 여기 야가 어딨어... 야.' 이 대사 하려던 거였는데 망했잖아 😂",
+            delay: 1300,
+            time: "오후 6:47"
+          },
+          {
+            type: "text",
+            text: "아 이거 진짜 부끄럽네ㅋㅋ 그래도 방금 영상 찍어둔 거 보낼게, 너만 몰래 봐!",
+            delay: 1200,
+            time: "오후 6:48"
+          },
+          {
+            type: "shorts",
+            shortsId: "P4wBkideNng",
+            delay: 1050,
+            time: "오후 6:48"
+          }
+        ],
+        autoNext: "ep2_clear"
+      },
+
+      ep2_clear: {
+        episodeId: "ep2",
+        messages: [
+          {
+            type: "text",
+            text: "너랑 연습한 덕분에 긴장 싹 풀렸다! 팬미팅 잘 마치고, 내일은 하퍼스 바자 화보 촬영장 가서 또 연락할게 ✨",
+            delay: 1250,
+            time: "오후 6:51"
+          }
+        ],
+        nextEpisode: {
+          epTitle: "EP.2 남친모드 상황극 [확장판] 클리어!",
+          desc: "팬미팅 남친모드 쇼츠가 앨범에 해금되었습니다. 다음은 신규 에피소드 [NEW] 하퍼스 바자 촬영장 비하인드입니다!",
+          nextEpId: "ep3",
+          nextNodeId: "ep3_start",
+          nextButtonText: "EP.3 온 세상이 변우석 하는 이유 [NEW] ▶"
+        }
+      },
+
+      /* ========================================================================
+         EP.3 [온 세상이 변우석 하는 이유 NEW!] — 4ArZZ-qgbiY
+         - Harper's BAZAAR 촬영장: 카메라 앞 프로페셔널 카리스마 vs 컷 뒤 잔망미 폭발
+         ======================================================================== */
+      ep3_start: {
+        episodeId: "ep3",
+        messages: [
+          { type: "date", text: "EP.3 · 온 세상이 변우석 하는 이유 [NEW] (BAZAAR 촬영장)" },
+          {
+            type: "narration",
+            text: "화려한 조명이 쏟아지는 Harper's BAZAAR 화보 촬영 스튜디오. 카메라 셔터 앞에서는 숨 막히는 카리스마를 뿜어내던 변우석이, '컷!' 소리가 떨어지자마자 특유의 해맑은 잔망미로 스튜디오를 웃음바다로 만든다.",
+            delay: 1000
+          },
+          {
+            type: "text",
+            text: "지금 바자 화보 촬영 잠깐 쉬는 시간! 방금 엄청 진지하고 시크한 컨셉 찍다가 컷 소리 나자마자 웃음 터져 버렸어 ㅋㅋ",
+            delay: 1250,
+            time: "오후 3:14"
+          },
+          {
+            type: "photo",
+            shortsId: "4ArZZ-qgbiY",
+            caption: "카메라 꺼지자마자 바로 무장해제된 현장 비하인드 컷 📸✨",
+            delay: 1100,
+            time: "오후 3:15"
+          },
+          {
+            type: "text",
+            text: "에디터님들이 카메라 앞이랑 컷 뒤랑 사람이 완전히 다르대 ㅎㅎ 너 보기엔 어때? 너무 장난꾸러기 같아?",
+            delay: 1250,
+            time: "오후 3:16"
+          }
+        ],
+        choices: [
+          {
+            text: "갭차이 놀리기: 화보 눈빛이랑 컷 소리 뒤 잔망미 갭차이 뭐예요 ㅋㅋ 온 세상이 반할 만하네!",
+            replyText: "화보 찍을 때 눈빛이랑 컷 소리 나자마자 터지는 잔망미 갭차이 뭐예요 ㅋㅋ 온 세상이 자꾸 변우석 하는 이유 알겠네 ✨",
+            next: "ep3_reaction_duality",
+            affinity: 11,
+            setFlag: "behind_smile"
+          },
+          {
+            text: "프로페셔널함 칭찬: 일할 때 집중하는 모습도 멋지고, 현장 분위기 밝게 만드는 것도 진짜 프로예요!",
+            replyText: "카메라 돌아갈 때 눈빛 싹 바뀌는 것도 멋지지만, 쉬는 시간에 스태프분들 웃게 해주는 게 진짜 최고 프로예요 👍💗",
+            next: "ep3_reaction_pro",
+            affinity: 10,
+            setFlag: "behind_smile"
+          },
+          {
+            text: "비밀 윙크 요청: 에디터님들 말고 지금 나한테만 몰래 윙크 한 번 해주면 안 돼요? 😉",
+            replyText: "현장 에디터님들만 잔망미 보면 억울하죠! 지금 나한테만 몰래 비밀 윙크 한 번 해줘요 😉💕",
+            next: "ep3_reaction_wink",
+            affinity: 12,
+            setFlag: "behind_smile"
+          }
+        ]
+      },
+
+      ep3_reaction_duality: {
+        episodeId: "ep3",
+        messages: [
+          {
+            type: "text",
+            text: "에이 ㅋㅋ '온 세상이 변우석'이라니 그런 과찬 들으면 나 또 광대 승천하잖아 😆",
+            delay: 1150,
+            time: "오후 3:18"
+          },
+          {
+            type: "text",
+            text: "근데 사실은… 온 세상 말고 너 하나만 내 편이었으면 좋겠어. 어, 나 지금 너무 멋있는 멘트 했나? ㅎㅎ",
+            delay: 1300,
+            time: "오후 3:18"
+          }
+        ],
+        autoNext: "ep3_shorts_reveal"
+      },
+
+      ep3_reaction_pro: {
+        episodeId: "ep3",
+        messages: [
+          {
+            type: "text",
+            text: "와… 그렇게 말해 주는 사람 진짜 오랜만이다. 왠지 피곤했던 게 한 번에 다 날아가는 기분이야 🥹",
+            delay: 1200,
+            time: "오후 3:18"
+          },
+          {
+            type: "text",
+            text: "네가 응원해 주니까 다음 컷은 더 멋있게 찍어 볼게! 아, 그 전에 선물 하나 줄게.",
+            delay: 1250,
+            time: "오후 3:18"
+          }
+        ],
+        autoNext: "ep3_shorts_reveal"
+      },
+
+      ep3_reaction_wink: {
+        episodeId: "ep3",
+        messages: [
+          {
+            type: "text",
+            text: "지금 거울 보면서 몰래 윙크 연습했는데… 메이크업 실장님이랑 눈 마주쳐 버렸어 ㅋㅋㅋ 🙈",
+            delay: 1200,
+            time: "오후 3:18"
+          },
+          {
+            type: "text",
+            text: "진짜 비밀 윙크는 다음에 만나서 네 눈앞에서만 해줄게! 대신 오늘 촬영장 비하인드부터 제일 먼저 보여줄게.",
+            delay: 1300,
+            time: "오후 3:18"
+          }
+        ],
+        autoNext: "ep3_shorts_reveal"
+      },
+
+      ep3_shorts_reveal: {
+        episodeId: "ep3",
+        messages: [
+          {
+            type: "text",
+            text: "에디터님들이 찍어준 현장 비하인드래, 너한테 제일 먼저 보여줄게 ✨",
+            delay: 1150,
+            time: "오후 3:20"
+          },
+          {
+            type: "shorts",
+            shortsId: "4ArZZ-qgbiY",
+            delay: 1050,
+            time: "오후 3:20"
+          }
+        ],
+        choices: [
+          {
+            text: "잔망미에 완전 반함: 진짜 1초도 눈을 못 떼겠어요! 남은 촬영도 화이팅해요 💗",
+            replyText: "와 진짜 1초도 눈을 못 떼겠어요! 반전 매력 미쳤다… 남은 화보 촬영도 화이팅해요 💗",
+            next: "ep3_clear",
+            affinity: 8
+          },
+          {
+            text: "따뜻한 배려: 웃느라 에너지 다 썼겠네~ 끝나고 따뜻한 거 마시면서 쉬어요!",
+            replyText: "촬영장에서 열심히 웃고 포즈 잡느라 힘들었겠네~ 끝나고 꼭 따뜻한 거 마시면서 푹 쉬어요 ☕",
+            next: "ep3_clear",
+            affinity: 9
+          }
+        ]
+      },
+
+      ep3_clear: {
+        episodeId: "ep3",
+        messages: [
+          {
+            type: "text",
+            text: "응! 고마워. 오늘 촬영 끝나고 집에 돌아가는 길에… 문득 들려주고 싶은 구절이 있어서 밤에 목소리 남겨도 될까? 🌙",
+            delay: 1250,
+            time: "오후 3:23"
+          }
+        ],
+        nextEpisode: {
+          epTitle: "EP.3 온 세상이 변우석 하는 이유 클리어!",
+          desc: "신규 하퍼스 바자 비하인드 쇼츠가 앨범에 저장되었습니다. 깊은 밤 감성 보이스노트가 도착하는 EP.4로 이어집니다.",
+          nextEpId: "ep4",
+          nextNodeId: "ep4_start",
+          nextButtonText: "EP.4 푸르른 봄, 우리의 청춘 ▶"
+        }
+      },
+
+      /* ========================================================================
+         EP.4 [푸르른 봄, 우리의 청춘] — YG9G-Rl-M6E
+         ======================================================================== */
+      ep4_start: {
+        episodeId: "ep4",
+        messages: [
+          { type: "date", text: "EP.4 · 푸르른 봄, 우리의 청춘 (조용한 늦은 밤)" },
+          {
+            type: "narration",
+            text: "모든 일정을 마치고 돌아온 늦은 밤. 창밖으로 불어오는 잔잔한 밤바람과 함께 우석의 다정한 보이스노트가 도착했다.",
+            delay: 900
+          },
+          {
+            type: "text",
+            text: "아직 안 자지? 오늘 인터뷰 준비하면서 읽은 글귀가 계속 머릿속에 맴돌아서… 너한테 꼭 들려주고 싶었어.",
+            delay: 1250,
+            time: "오후 11:12"
+          },
+          {
+            type: "voice",
+            shortsId: "YG9G-Rl-M6E",
+            duration: "0:18",
+            transcript: "“꽃피는 푸르른 봄이라, 일생에 단 한 번뿐이라는 청춘… 생각보다 금방 지나가 버리잖아. 근데 너랑 함께 웃는 지금 이 순간만큼은, 시간이 아주 천천히 흘렀으면 좋겠어.”",
+            delay: 1100,
+            time: "오후 11:13"
+          },
+          {
+            type: "shorts",
+            shortsId: "YG9G-Rl-M6E",
+            delay: 1050,
+            time: "오후 11:14"
+          }
+        ],
+        choices: [
+          {
+            text: "촬영장 컷 뒤의 그 환한 미소처럼, 우리의 푸르른 봄도 평생 함께 간직하자 🌸",
+            replyText: "우석아, 휴일 필름 사진이랑 촬영장 컷 뒤에서 보여줬던 환한 미소처럼… 우리의 푸르른 봄도 평생 함께 기억하고 간직하자 🌸",
+            next: "ep4_deep_reply",
+            affinity: 14,
+            setFlag: "spring_promise",
+            condition: {
+              any: [
+                { hasFlag: "behind_smile" },
+                { hasFlag: "took_photo" },
+                { minAffinity: 45 }
+              ]
+            },
+            specialLabel: "✨ 스페셜 선택지 (비하인드/필름/호감도 45+)"
+          },
+          {
+            text: "목소리만 들어도 하루 피로가 다 녹아내려. 나한테도 지금이 제일 빛나는 봄이야.",
+            replyText: "보이스노트 몇 번이나 다시 들었어. 너랑 함께해서 나한테도 올해가 제일 빛나는 푸르른 봄이야 📖💕",
+            next: "ep4_deep_reply",
+            affinity: 10,
+            setFlag: "spring_promise"
+          },
+          {
+            text: "문장이 진짜 시 같네! 목소리 톤이 너무 좋아서 라디오 듣는 기분이야.",
+            replyText: "글귀도 너무 예쁘고 목소리 톤이 차분해서 심야 라디오 듣는 기분이야 ㅎㅎ",
+            next: "ep4_light_reply",
+            affinity: 5
+          }
+        ]
+      },
+
+      ep4_deep_reply: {
+        episodeId: "ep4",
+        messages: [
+          {
+            type: "text",
+            text: "방금 네 답장 읽고 한참 동안 휴대폰만 바라봤어. 가슴이 이상하게 몽글몽글해지네.",
+            delay: 1250,
+            time: "오후 11:16"
+          },
+          {
+            type: "text",
+            text: "우리 약속하자. 계절이 몇 번이나 바뀌어도, 봄바람이 불 때마다 서로를 제일 먼저 떠올려 주기로.",
+            delay: 1350,
+            time: "오후 11:17"
+          }
+        ],
+        choices: [
+          {
+            text: "손가락 걸고 약속할게 🤙 내일 까르띠에 촬영 끝나고 꼭 연락해!",
+            replyText: "응, 손가락 걸고 꼭 약속할게 🤙 내일 블랙 셔츠 화보 촬영도 멋있게 끝내고 제일 먼저 연락해 줘!",
+            next: "ep4_clear",
+            affinity: 7
+          },
+          {
+            text: "이미 예쁜 계절을 볼 때마다 네가 제일 먼저 떠올라 💛",
+            replyText: "사실 이미 예쁜 하늘이나 바람 느낄 때마다 네가 제일 먼저 떠오르는걸 💛 내일 촬영 파이팅!",
+            next: "ep4_clear",
+            affinity: 9
+          }
+        ]
+      },
+
+      ep4_light_reply: {
+        episodeId: "ep4",
+        messages: [
+          {
+            type: "text",
+            text: "ㅎㅎ 심야 라디오 같다고 해주니 고맙네. 사실 조금 진심을 담아봤는데 쑥스럽다.",
+            delay: 1200,
+            time: "오후 11:16"
+          },
+          {
+            type: "text",
+            text: "내일 저녁에 까르띠에 블랙 셔츠 화보가 있어서 일찍 자야겠다. 잘 자!",
+            delay: 1250,
+            time: "오후 11:17"
+          }
+        ],
+        autoNext: "ep4_clear"
+      },
+
+      ep4_clear: {
+        episodeId: "ep4",
+        messages: [
+          {
+            type: "text",
+            text: "내일 촬영 끝나면… 더 이상 미루지 않고 꼭 전하고 싶은 말이 있어. 밤에 기다려 줄 거지? ✨",
+            delay: 1200,
+            time: "오후 11:19"
+          }
+        ],
+        nextEpisode: {
+          epTitle: "EP.4 푸르른 봄, 우리의 청춘 클리어!",
+          desc: "감성 보이스노트와 청춘 쇼츠가 해금되었습니다. 드디어 마지막 에피소드, 블랙 셔츠 고백의 밤이 찾아옵니다.",
+          nextEpId: "ep5",
+          nextNodeId: "ep5_start",
+          nextButtonText: "EP.5 두근거리는 고백 시작 ▶"
+        }
+      },
+
+      /* ========================================================================
+         EP.5 [두근거리는 고백] — vPeiPH3hc2Y (까르띠에 블랙 셔츠 촬영 후 고백 & 3종 엔딩)
+         ======================================================================== */
+      ep5_start: {
+        episodeId: "ep5",
+        messages: [
+          { type: "date", text: "EP.5 · 두근거리는 고백 (블랙 셔츠 화보 직후)" },
+          {
+            type: "narration",
+            text: "깊은 밤, 블랙 셔츠 차림의 까르띠에 화보 촬영을 막 마친 변우석. 조명이 하나둘 꺼지는 스튜디오 한켠에서 조심스레 짧은 영상을 보내왔다.",
+            delay: 950
+          },
+          {
+            type: "shorts",
+            shortsId: "vPeiPH3hc2Y",
+            delay: 1050,
+            time: "오후 10:42"
+          },
+          {
+            type: "text",
+            text: "방금 촬영 끝나고 모니터링하다가… 카메라 앞에서 심장 위에 손 얹고 웃는 내 얼굴을 봤는데,",
+            delay: 1300,
+            time: "오후 10:43"
+          },
+          {
+            type: "text",
+            text: "솔직히 말해 줘. 나 너 생각할 때 표정에 티가 너무 많이 나지? 숨기려고 해도 자꾸 웃음이 나고 심장이 너무 뛰어.",
+            delay: 1450,
+            time: "오후 10:44"
+          },
+          {
+            type: "text",
+            text: "오늘만큼은 상황극도, 화보도 아니고 그냥 변우석으로서 진심으로 물어볼게. 나랑… 진짜로 만나줄래?",
+            delay: 1500,
+            time: "오후 10:45"
+          }
+        ],
+        choices: [
+          {
+            text: "티 많이 났어, 그래서 더 설렜어. 우리의 푸르른 봄, 이제 진짜 연인으로 시작하자 💖",
+            replyText: "응, 표정에 다 쓰여 있어서 나도 내내 심장이 뛰었어. 우리 약속했던 푸르른 봄처럼, 이제 진짜 연인으로 함께하자 💖",
+            affinity: 12,
+            routeEnding: true,
+            condition: {
+              any: [
+                { hasFlag: "spring_promise" },
+                { minAffinity: 55 }
+              ]
+            },
+            specialLabel: "💍 진심의 고백 (봄의 약속 / 호감도 55+)"
+          },
+          {
+            text: "나도 요즘 너 생각하느라 하루가 다 가. 우리 천천히 진지하게 시작해 볼래? 🌸",
+            replyText: "나도 요즘 네 메시지 기다리는 시간이 제일 행복했어. 아직 조금 쑥스럽지만, 우리 진지하게 시작해 볼래? 🌸",
+            affinity: 6,
+            routeEnding: true
+          },
+          {
+            text: "마음은 고맙지만… 화면 속 빛나는 사람으로만 응원하는 게 맞을 것 같아.",
+            replyText: "마음은 정말 고마운데… 우린 각자의 자리에서 멀리 응원하는 사이로 남는 게 좋을 것 같아. 미안해.",
+            affinity: -40,
+            next: "ending_bad"
+          }
+        ]
+      },
+
+      /* ========================================================================
+         3종 멀티 엔딩 노드 (TRUE HAPPY / NORMAL / BAD)
+         ======================================================================== */
+      ending_happy: {
+        episodeId: "ep5",
+        messages: [
+          {
+            type: "narration",
+            text: "답장을 보낸 지 3초도 채 되지 않아 '읽음' 표시가 사라지더니, 벅찬 감정이 고스란히 담긴 답장이 쏟아진다.",
+            delay: 900
+          },
+          {
+            type: "text",
+            text: "진짜지?! 나 지금 스튜디오 복도에서 혼자 소리 지를 뻔했어 ㅠㅠ",
+            delay: 1200,
+            time: "오후 10:46"
+          },
+          {
+            type: "text",
+            text: "지금 바로 데리러 갈게. 블랙 셔츠 벗지도 않고 달려가도 되지? 오늘부터 내 모든 봄은 전부 너야. 사랑해 💛",
+            delay: 1450,
+            time: "오후 10:47"
+          }
+        ],
+        endingId: "ending_happy"
+      },
+
+      ending_normal: {
+        episodeId: "ep5",
+        messages: [
+          {
+            type: "narration",
+            text: "잠시 입력 중 표시가 깜빡이다가, 안도감과 따뜻한 설렘이 묻어나는 답장이 도착한다.",
+            delay: 950
+          },
+          {
+            type: "text",
+            text: "다행이다… 사실 답장 기다리면서 심장 터지는 줄 알았어 ㅎㅎ",
+            delay: 1250,
+            time: "오후 10:47"
+          },
+          {
+            type: "text",
+            text: "좋아, 서두르지 않고 천천히 맞춰가자. 이번 주말엔 둘이서 조용한 카페부터 가볼까? 잘 자, 내일 또 연락할게 🌸",
+            delay: 1400,
+            time: "오후 10:48"
+          }
+        ],
+        endingId: "ending_normal"
+      },
+
+      ending_bad: {
+        episodeId: "ep5",
+        messages: [
+          {
+            type: "narration",
+            text: "한참 동안 화면 위에 아무런 표시도 뜨지 않았다. 몇 분이 흐른 뒤, 조심스럽고 씁쓸한 마지막 메시지가 도착했다.",
+            delay: 1050
+          },
+          {
+            type: "text",
+            text: "…그렇구나. 내가 너무 내 마음만 앞섰나 봐. 부담 줬다면 미안해.",
+            delay: 1350,
+            time: "오후 10:51"
+          },
+          {
+            type: "text",
+            text: "함께 웃었던 시간은 정말 소중했어. 앞으로도 늘 건강하고 행복하길 바랄게.",
+            delay: 1400,
+            time: "오후 10:52"
+          }
+        ],
+        endingId: "ending_bad"
+      }
+    };
+
+
+    /* ==========================================================================
+       [섹션 5] Web Audio API 자체 합성 효과음 (외부 사운드 파일 불필요)
+       ========================================================================== */
+    const SoundFX = (() => {
+      let ctx = null;
+
+      function ensureContext() {
+        try {
+          if (!ctx) {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (!AudioCtx) return null;
+            ctx = new AudioCtx();
+          }
+          if (ctx.state === "suspended") {
+            ctx.resume().catch(() => {});
+          }
+          return ctx;
+        } catch (err) {
+          return null;
+        }
+      }
+
+      function playTone(freq, duration, type = "sine", volume = 0.05, delay = 0) {
+        if (!gameState.soundEnabled) return;
+        const audio = ensureContext();
+        if (!audio) return;
+        try {
+          const now = audio.currentTime + delay;
+          const osc = audio.createOscillator();
+          const gain = audio.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, now);
+          gain.gain.setValueAtTime(0.0001, now);
+          gain.gain.exponentialRampToValueAtTime(volume, now + 0.014);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+          osc.connect(gain);
+          gain.connect(audio.destination);
+          osc.start(now);
+          osc.stop(now + duration + 0.02);
+        } catch (err) {
+          // 브라우저 자동재생 정책으로 차단된 경우 조용히 무시
+        }
+      }
+
+      return {
+        msgIn() {
+          playTone(660, 0.08, "sine", 0.042, 0);
+          playTone(880, 0.11, "sine", 0.038, 0.05);
+        },
+        msgOut() {
+          playTone(540, 0.07, "triangle", 0.034, 0);
+        },
+        voiceChime() {
+          playTone(523.25, 0.18, "sine", 0.045, 0);
+          playTone(659.25, 0.22, "sine", 0.045, 0.1);
+          playTone(783.99, 0.28, "sine", 0.04, 0.2);
+        },
+        affinityUp() {
+          playTone(659.25, 0.13, "sine", 0.052, 0);
+          playTone(830.61, 0.14, "sine", 0.052, 0.08);
+          playTone(987.77, 0.22, "sine", 0.056, 0.16);
+        },
+        affinityDown() {
+          playTone(420, 0.14, "sine", 0.042, 0);
+          playTone(330, 0.18, "sine", 0.038, 0.09);
+        },
+        unlock() {
+          playTone(523.25, 0.14, "triangle", 0.048, 0);
+          playTone(659.25, 0.14, "triangle", 0.048, 0.08);
+          playTone(783.99, 0.18, "triangle", 0.05, 0.16);
+          playTone(1046.5, 0.28, "sine", 0.055, 0.24);
+        }
+      };
+    })();
+
+
+    /* ==========================================================================
+       [섹션 6] 3단계 이미지 Fallback (hqdefault -> mqdefault -> SVG Placeholder)
+       ========================================================================== */
+    function createStylizedSvgPlaceholder(label = "변우석") {
+      const safeLabel = String(label).slice(0, 14);
+      const svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240">
+          <defs>
+            <linearGradient id="rg" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#FDE2E4"/>
+              <stop offset="52%" stop-color="#FAD2CF"/>
+              <stop offset="100%" stop-color="#F5DFC9"/>
+            </linearGradient>
+          </defs>
+          <rect width="320" height="240" fill="url(#rg)"/>
+          <circle cx="160" cy="96" r="34" fill="rgba(255,255,255,0.9)"/>
+          <path d="M98 188 C98 144, 222 144, 222 188" fill="rgba(255,255,255,0.9)"/>
+          <text x="160" y="218" text-anchor="middle" font-size="16" font-weight="700" fill="#B64E5D" font-family="sans-serif">♥ ${safeLabel}</text>
+        </svg>
+      `.trim();
+      return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+    }
+
+    function applyThumbWithFallback(imgEl, primaryUrl, fallbackUrl, label) {
+      let stage = 0;
+      imgEl.onerror = () => {
+        if (stage === 0 && fallbackUrl && fallbackUrl !== primaryUrl) {
+          stage = 1;
+          imgEl.src = fallbackUrl;
+        } else {
+          imgEl.onerror = null;
+          imgEl.src = createStylizedSvgPlaceholder(label);
+        }
+      };
+      imgEl.src = primaryUrl || createStylizedSvgPlaceholder(label);
+    }
+
+
+    /* ==========================================================================
+       [섹션 7] 전역 상태 관리 & 버전 분리 localStorage 저장 (byeonyeonsi_v2_state)
+       ========================================================================== */
+    const STORAGE_KEY = "byeonyeonsi_v2_state";
+
+    function createInitialState(preserved = {}) {
+      return {
+        version: 2,
+        currentView: "lobby",
+        currentEpisodeId: "ep1",
+        currentNodeId: "ep1_start",
+        affinity: CHARACTER_CONFIG.initialAffinity,
+        history: [],
+        flags: {},
+        unlockedShorts: Array.isArray(preserved.unlockedShorts) ? [...preserved.unlockedShorts] : [],
+        unlockedEndings: Array.isArray(preserved.unlockedEndings) ? [...preserved.unlockedEndings] : [],
+        completedEpisodes: Array.isArray(preserved.completedEpisodes) ? [...preserved.completedEpisodes] : [],
+        nodeCompleted: false,
+        speedMultiplier: typeof preserved.speedMultiplier === "number" ? preserved.speedMultiplier : 1,
+        soundEnabled: typeof preserved.soundEnabled === "boolean" ? preserved.soundEnabled : true,
+        hasUnreadGallery: false
+      };
+    }
+
+    let gameState = createInitialState();
+    let activeRunToken = 0;
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(gameState));
+      } catch (err) {
+        console.warn("저장 실패:", err);
+      }
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return createInitialState();
+        const parsed = JSON.parse(raw);
+
+        // 유효한 노드인지 검증 (시나리오 구조 변경 시 안전 복구)
+        if (!parsed || parsed.version !== 2 || !SCENARIOS[parsed.currentNodeId]) {
+          return createInitialState(parsed || {});
+        }
+
+        const validShorts = Array.isArray(parsed.unlockedShorts)
+          ? parsed.unlockedShorts.filter((id) => Boolean(SHORTS_CATALOG[id]))
+          : [];
+        const validEndings = Array.isArray(parsed.unlockedEndings)
+          ? parsed.unlockedEndings.filter((id) => Boolean(ENDINGS_META[id]))
+          : [];
+
+        return {
+          ...createInitialState(),
+          ...parsed,
+          flags: parsed.flags && typeof parsed.flags === "object" ? parsed.flags : {},
+          history: Array.isArray(parsed.history) ? parsed.history : [],
+          unlockedShorts: validShorts,
+          unlockedEndings: validEndings,
+          completedEpisodes: Array.isArray(parsed.completedEpisodes) ? parsed.completedEpisodes : []
+        };
+      } catch (err) {
+        console.warn("세이브 데이터 파싱 오류, 새 상태로 시작합니다:", err);
+        return createInitialState();
+      }
+    }
+
+
+    /* ==========================================================================
+       [섹션 8] DOM 캐시 & 공통 유틸리티
+       ========================================================================== */
+    const DOM = {
+      views: {
+        lobby: document.getElementById("viewLobby"),
+        chat: document.getElementById("viewChat"),
+        gallery: document.getElementById("viewGallery")
+      },
+      navButtons: document.querySelectorAll(".nav-tab-btn"),
+      galleryUnreadDot: document.getElementById("galleryUnreadDot"),
+
+      // 로비
+      lobbyHeroAvatar: document.getElementById("lobbyHeroAvatar"),
+      lobbyCharName: document.getElementById("lobbyCharName"),
+      lobbyCharStatus: document.getElementById("lobbyCharStatus"),
+      lobbyRelBadge: document.getElementById("lobbyRelBadge"),
+      lobbyAffinityText: document.getElementById("lobbyAffinityText"),
+      lobbyAffinityFill: document.getElementById("lobbyAffinityFill"),
+      lobbyShortsCount: document.getElementById("lobbyShortsCount"),
+      lobbyEndingsCount: document.getElementById("lobbyEndingsCount"),
+      btnLobbyContinue: document.getElementById("btnLobbyContinue"),
+      btnLobbyNewGame: document.getElementById("btnLobbyNewGame"),
+      lobbyEpisodeList: document.getElementById("lobbyEpisodeList"),
+
+      // 채팅
+      chatHeaderAvatar: document.getElementById("chatHeaderAvatar"),
+      chatCharName: document.getElementById("chatCharName"),
+      chatEpChip: document.getElementById("chatEpChip"),
+      chatCharStatus: document.getElementById("chatCharStatus"),
+      affinityWrap: document.getElementById("affinityWrap"),
+      affinityHeart: document.getElementById("affinityHeart"),
+      affinityProgress: document.getElementById("affinityProgress"),
+      affinityFill: document.getElementById("affinityFill"),
+      affinityScore: document.getElementById("affinityScore"),
+      chatMessages: document.getElementById("chatMessages"),
+      interactionArea: document.getElementById("interactionArea"),
+
+      // 갤러리
+      galleryShortsProgress: document.getElementById("galleryShortsProgress"),
+      galleryShortsGrid: document.getElementById("galleryShortsGrid"),
+      galleryEndingsProgress: document.getElementById("galleryEndingsProgress"),
+      galleryEndingsList: document.getElementById("galleryEndingsList"),
+
+      // 모달
+      shortsModal: document.getElementById("shortsModal"),
+      shortsModalTag: document.getElementById("shortsModalTag"),
+      shortsModalTitle: document.getElementById("shortsModalTitle"),
+      shortsIframeStage: document.getElementById("shortsIframeStage"),
+      shortsModalNote: document.getElementById("shortsModalNote"),
+      shortsExtLink: document.getElementById("shortsExtLink"),
+
+      photoModal: document.getElementById("photoModal"),
+      photoModalImg: document.getElementById("photoModalImg"),
+      photoModalCaption: document.getElementById("photoModalCaption"),
+      btnPhotoWatchShort: document.getElementById("btnPhotoWatchShort"),
+
+      devModal: document.getElementById("devModal"),
+      devCurrentNode: document.getElementById("devCurrentNode"),
+      devAffinityVal: document.getElementById("devAffinityVal"),
+      devAffinitySlider: document.getElementById("devAffinitySlider"),
+      devNodeSelect: document.getElementById("devNodeSelect"),
+      devFlagsList: document.getElementById("devFlagsList"),
+      btnSpeedNormal: document.getElementById("btnSpeedNormal"),
+      btnSpeedFast: document.getElementById("btnSpeedFast"),
+
+      resetModal: document.getElementById("resetModal"),
+      toast: document.getElementById("toast")
+    };
+
+    function sleep(ms) {
+      return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+
+    function getFormattedNow() {
+      const now = new Date();
+      let h = now.getHours();
+      const m = String(now.getMinutes()).padStart(2, "0");
+      const p = h >= 12 ? "오후" : "오전";
+      h = h % 12 || 12;
+      return `${p} ${h}:${m}`;
+    }
+
+    let toastTimer = null;
+    function showToast(msg) {
+      DOM.toast.textContent = msg;
+      DOM.toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => DOM.toast.classList.remove("show"), 2400);
+    }
+
+    function scrollChatToBottom() {
+      requestAnimationFrame(() => {
+        DOM.chatMessages.scrollTop = DOM.chatMessages.scrollHeight;
+      });
+    }
+
+    function getRelationshipRank(affinity) {
+      if (affinity >= 75) return "💖 운명적인 연인";
+      if (affinity >= 55) return "🌸 두근거리는 썸";
+      if (affinity >= 35) return "✨ 가까워지는 사이";
+      return "💌 설렘의 시작";
+    }
+
+
+    /* ==========================================================================
+       [섹션 9] 뷰 전환 및 상태 동기화 (로비 / 채팅 / 갤러리)
+       ========================================================================== */
+    function switchView(viewName) {
+      if (!DOM.views[viewName]) return;
+      gameState.currentView = viewName;
+
+      Object.keys(DOM.views).forEach((key) => {
+        DOM.views[key].classList.toggle("active", key === viewName);
+      });
+
+      DOM.navButtons.forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.view === viewName);
+      });
+
+      if (viewName === "lobby") {
+        renderLobby();
+      } else if (viewName === "gallery") {
+        gameState.hasUnreadGallery = false;
+        DOM.galleryUnreadDot.classList.remove("visible");
+        renderGallery();
+      } else if (viewName === "chat") {
+        scrollChatToBottom();
+      }
+
+      saveState();
+    }
+
+    function updateSoundButtonsUI() {
+      const icon = gameState.soundEnabled ? "🔊" : "🔇";
+      document.querySelectorAll(".js-sound-toggle").forEach((btn) => {
+        btn.textContent = icon;
+      });
+    }
+
+    function updateChatHeaderStatus(isTyping = false) {
+      const epId = gameState.currentEpisodeId || "ep1";
+      const epMeta = EPISODES.find((e) => e.id === epId) || EPISODES[0];
+      DOM.chatEpChip.textContent = epMeta.code;
+
+      if (isTyping) {
+        DOM.chatCharStatus.textContent = CHARACTER_CONFIG.statusTyping;
+        DOM.chatCharStatus.classList.add("is-typing");
+      } else {
+        DOM.chatCharStatus.textContent =
+          CHARACTER_CONFIG.episodeStatus[epId] || CHARACTER_CONFIG.statusMessage;
+        DOM.chatCharStatus.classList.remove("is-typing");
+      }
+    }
+
+    function updateAffinityUI(delta = 0) {
+      const min = CHARACTER_CONFIG.minAffinity;
+      const max = CHARACTER_CONFIG.maxAffinity;
+      gameState.affinity = Math.max(min, Math.min(max, gameState.affinity));
+
+      const pct = Math.round(((gameState.affinity - min) / (max - min)) * 100);
+      DOM.affinityFill.style.width = `${pct}%`;
+      DOM.affinityScore.textContent = `${gameState.affinity} / ${max}`;
+      DOM.affinityProgress.setAttribute("aria-valuenow", String(gameState.affinity));
+
+      DOM.lobbyAffinityFill.style.width = `${pct}%`;
+      DOM.lobbyAffinityText.textContent = `${gameState.affinity} / ${max}`;
+      DOM.lobbyRelBadge.textContent = getRelationshipRank(gameState.affinity);
+
+      if (delta !== 0) {
+        DOM.affinityHeart.classList.remove("pop");
+        void DOM.affinityHeart.offsetWidth;
+        DOM.affinityHeart.classList.add("pop");
+
+        const floatEl = document.createElement("span");
+        floatEl.className = `affinity-float ${delta > 0 ? "positive" : "negative"}`;
+        floatEl.textContent = delta > 0 ? `+${delta} ♥` : `${delta} 💔`;
+        DOM.affinityWrap.appendChild(floatEl);
+        setTimeout(() => floatEl.remove(), 1480);
+
+        if (delta > 0) SoundFX.affinityUp();
+        else SoundFX.affinityDown();
+      }
+
+      refreshDevModalUI();
+    }
+
+    function changeAffinity(delta) {
+      if (!delta) return;
+      gameState.affinity += delta;
+      updateAffinityUI(delta);
+      saveState();
+    }
+
+    function unlockShort(shortsId, silent = false) {
+      const item = SHORTS_CATALOG[shortsId];
+      if (!item) return;
+      if (!gameState.unlockedShorts.includes(shortsId)) {
+        gameState.unlockedShorts.push(shortsId);
+        gameState.hasUnreadGallery = true;
+        DOM.galleryUnreadDot.classList.add("visible");
+        saveState();
+        if (!silent) {
+          SoundFX.unlock();
+          showToast(`🎞️ 쇼츠 앨범 해금: ${item.title}`);
+        }
+      }
+    }
+
+    /* --------------------------------------------------------------------------
+       로비 렌더링 (5개 에피소드 카드 + 확장/NEW 배지)
+       -------------------------------------------------------------------------- */
+    function renderLobby() {
+      const totalShorts = Object.keys(SHORTS_CATALOG).length;
+      const totalEndings = Object.keys(ENDINGS_META).length;
+
+      DOM.lobbyShortsCount.textContent = `${gameState.unlockedShorts.length} / ${totalShorts}`;
+      DOM.lobbyEndingsCount.textContent = `${gameState.unlockedEndings.length} / ${totalEndings}`;
+
+      const hasProgress = gameState.history.length > 0;
+      const curEp = EPISODES.find((e) => e.id === gameState.currentEpisodeId) || EPISODES[0];
+      DOM.btnLobbyContinue.textContent = hasProgress
+        ? `${curEp.code} 이어하기 ▶`
+        : "EP.1 설렘 시작하기 ▶";
+
+      DOM.lobbyEpisodeList.innerHTML = "";
+      EPISODES.forEach((ep) => {
+        const shortItem = SHORTS_CATALOG[ep.shortsId];
+        const isCurrent = gameState.currentEpisodeId === ep.id && hasProgress;
+        const isCleared = gameState.completedEpisodes.includes(ep.id);
+        const isShortUnlocked = gameState.unlockedShorts.includes(ep.shortsId);
+
+        const card = document.createElement("button");
+        card.type = "button";
+        card.className = `ep-card${isCurrent ? " is-current" : ""}`;
+
+        const thumbWrap = document.createElement("div");
+        thumbWrap.className = "ep-thumb-wrap";
+
+        const img = document.createElement("img");
+        img.className = "ep-thumb-img";
+        img.alt = ep.title;
+        applyThumbWithFallback(img, shortItem.thumbnailUrl, shortItem.fallbackThumb, ep.title);
+
+        const codeBadge = document.createElement("span");
+        codeBadge.className = "ep-thumb-badge";
+        codeBadge.textContent = ep.code;
+
+        const playIcon = document.createElement("span");
+        playIcon.className = "ep-thumb-play";
+        playIcon.textContent = "▶";
+
+        thumbWrap.append(img, codeBadge, playIcon);
+
+        const body = document.createElement("div");
+        body.className = "ep-body";
+
+        const top = document.createElement("div");
+        top.className = "ep-meta-top";
+
+        const tagGroup = document.createElement("div");
+        tagGroup.className = "ep-tag-group";
+
+        const tag = document.createElement("span");
+        tag.className = "ep-tag";
+        tag.textContent = shortItem.tag;
+        tagGroup.appendChild(tag);
+
+        if (ep.badge) {
+          const spBadge = document.createElement("span");
+          spBadge.className = `ep-special-badge badge-${ep.badge.type}`;
+          spBadge.textContent = ep.badge.text;
+          tagGroup.appendChild(spBadge);
+        }
+
+        const status = document.createElement("span");
+        status.className = "ep-status-pill";
+        status.textContent = isCurrent
+          ? "진행 중 ●"
+          : (isCleared ? "클리어 ✓" : (isShortUnlocked ? "해금됨 ★" : "플레이 ▶"));
+
+        top.append(tagGroup, status);
+
+        const title = document.createElement("div");
+        title.className = "ep-title";
+        title.textContent = ep.title;
+
+        const desc = document.createElement("p");
+        desc.className = "ep-desc";
+        desc.textContent = ep.subtitle;
+
+        const chFoot = document.createElement("div");
+        chFoot.className = "ep-channel-foot";
+        chFoot.textContent = `🎬 ${shortItem.channel}`;
+
+        body.append(top, title, desc, chFoot);
+        card.append(thumbWrap, body);
+
+        card.addEventListener("click", () => {
+          startEpisodeFromLobby(ep.id, ep.startNode);
+        });
+
+        DOM.lobbyEpisodeList.appendChild(card);
+      });
+    }
+
+    function startEpisodeFromLobby(epId, startNodeId) {
+      if (gameState.currentEpisodeId === epId && gameState.history.length > 0) {
+        switchView("chat");
+        return;
+      }
+      switchView("chat");
+      gameState.currentEpisodeId = epId;
+      updateChatHeaderStatus(false);
+      playNode(startNodeId);
+    }
+
+    /* --------------------------------------------------------------------------
+       갤러리 렌더링 (5종 쇼츠 앨범 그리드 + 3종 엔딩 컬렉션)
+       -------------------------------------------------------------------------- */
+    function renderGallery() {
+      const shortsList = Object.values(SHORTS_CATALOG);
+      DOM.galleryShortsProgress.textContent = `${gameState.unlockedShorts.length} / ${shortsList.length} 해금됨`;
+      DOM.galleryShortsGrid.innerHTML = "";
+
+      shortsList.forEach((item) => {
+        const isUnlocked = gameState.unlockedShorts.includes(item.id);
+        const card = document.createElement("div");
+        card.className = `gallery-short-card ${isUnlocked ? "unlocked" : "locked"}`;
+
+        const thumb = document.createElement("div");
+        thumb.className = "gallery-short-thumb";
+
+        const img = document.createElement("img");
+        img.alt = item.title;
+        applyThumbWithFallback(img, item.thumbnailUrl, item.fallbackThumb, item.title);
+        thumb.appendChild(img);
+
+        if (isUnlocked) {
+          const playBadge = document.createElement("span");
+          playBadge.className = "gallery-play-badge";
+          playBadge.textContent = "▶";
+          thumb.appendChild(playBadge);
+          card.addEventListener("click", () => openShortsModal(item.id));
+        } else {
+          const lockOverlay = document.createElement("div");
+          lockOverlay.className = "gallery-lock-overlay";
+          lockOverlay.innerHTML = `
+            <div class="gallery-lock-icon">🔒</div>
+            <div class="gallery-lock-hint">${item.tag}<br/>채팅에서 해금</div>
+          `;
+          thumb.appendChild(lockOverlay);
+        }
+
+        const info = document.createElement("div");
+        info.className = "gallery-short-info";
+        info.innerHTML = `
+          <div>
+            <div class="gallery-short-tag">${item.tag}</div>
+            <div class="gallery-short-title">${isUnlocked ? item.title : "잠긴 쇼츠 클립"}</div>
+          </div>
+          <div class="gallery-short-channel">${isUnlocked ? item.channel : "에피소드 플레이 시 자동 해금"}</div>
+        `;
+
+        card.append(thumb, info);
+        DOM.galleryShortsGrid.appendChild(card);
+      });
+
+      // 엔딩 도감
+      const endingList = Object.values(ENDINGS_META);
+      DOM.galleryEndingsProgress.textContent = `${gameState.unlockedEndings.length} / ${endingList.length} 수집됨`;
+      DOM.galleryEndingsList.innerHTML = "";
+
+      endingList.forEach((end) => {
+        const isUnlocked = gameState.unlockedEndings.includes(end.id);
+        const gradeCls = end.grade.toLowerCase();
+
+        const row = document.createElement("div");
+        row.className = `dex-ending-card ${isUnlocked ? "unlocked" : "locked"}`;
+        row.innerHTML = `
+          <div class="dex-ending-icon ${gradeCls}">${isUnlocked ? end.icon : "🔒"}</div>
+          <div class="dex-ending-info">
+            <div class="dex-ending-rank">${end.rankLabel}</div>
+            <div class="dex-ending-title">${isUnlocked ? end.title : "???"}</div>
+            <p class="dex-ending-desc">${isUnlocked ? end.description : `해금 조건: ${end.hint}`}</p>
+          </div>
+        `;
+        DOM.galleryEndingsList.appendChild(row);
+      });
+    }
+
+
+    /* ==========================================================================
+       [섹션 10] 인앱 9:16 유튜브 쇼츠 라이트박스 & 포토 확대 모달
+       ========================================================================== */
+    function openShortsModal(shortsId) {
+      const item = SHORTS_CATALOG[shortsId];
+      if (!item) return;
+
+      // 시청 시 갤러리 자동 해금 보장
+      unlockShort(shortsId, true);
+
+      DOM.shortsModalTag.textContent = `${item.tag} · ${item.channel}`;
+      DOM.shortsModalTitle.textContent = item.title;
+      DOM.shortsModalNote.textContent = item.sceneNote;
+      DOM.shortsExtLink.href = item.directUrl;
+
+      // 모달 오픈 시 iframe 동적 마운트
+      DOM.shortsIframeStage.innerHTML = "";
+      const iframe = document.createElement("iframe");
+      iframe.src = `https://www.youtube.com/embed/${item.id}?autoplay=1&rel=0&playsinline=1`;
+      iframe.title = item.title;
+      iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+      iframe.allowFullscreen = true;
+      iframe.referrerPolicy = "strict-origin-when-cross-origin";
+      DOM.shortsIframeStage.appendChild(iframe);
+
+      DOM.shortsModal.classList.add("open");
+    }
+
+    function closeShortsModal() {
+      DOM.shortsModal.classList.remove("open");
+      // 닫을 때 iframe 즉시 파괴하여 오디오 완전 정지
+      DOM.shortsIframeStage.innerHTML = "";
+    }
+
+    let activePhotoShortsId = null;
+    function openPhotoModal(shortsId, caption) {
+      const item = SHORTS_CATALOG[shortsId];
+      if (!item) return;
+      activePhotoShortsId = shortsId;
+      applyThumbWithFallback(DOM.photoModalImg, item.thumbnailUrl, item.fallbackThumb, item.title);
+      DOM.photoModalCaption.textContent = caption || item.title;
+      DOM.photoModal.classList.add("open");
+    }
+
+
+    /* ==========================================================================
+       [섹션 11] 채팅 메시지 DOM 렌더링 (date, narration, text, photo, 9:16 shorts, voice)
+       ========================================================================== */
+    function createCharAvatarSlot(isConsecutive) {
+      const slot = document.createElement("div");
+      slot.className = "msg-char-avatar-slot";
+      if (!isConsecutive) {
+        const img = document.createElement("img");
+        img.className = "msg-char-avatar";
+        img.alt = CHARACTER_CONFIG.name;
+        applyThumbWithFallback(
+          img,
+          CHARACTER_CONFIG.avatarUrl,
+          CHARACTER_CONFIG.avatarFallbackUrl,
+          CHARACTER_CONFIG.name
+        );
+        slot.appendChild(img);
+      }
+      return slot;
+    }
+
+    function isCharLikeKind(kind) {
+      return ["char", "photo", "shorts", "voice"].includes(kind);
+    }
+
+    function appendMessageToDOM(entry, prevEntry = null) {
+      if (entry.kind === "date") {
+        const el = document.createElement("div");
+        el.className = "msg-date-divider";
+        el.textContent = entry.text;
+        DOM.chatMessages.appendChild(el);
+        return;
+      }
+
+      if (entry.kind === "narration") {
+        const el = document.createElement("div");
+        el.className = "msg-narration";
+        el.textContent = entry.text;
+        DOM.chatMessages.appendChild(el);
+        return;
+      }
+
+      const isChar = isCharLikeKind(entry.kind);
+      const isConsecutive = isChar && prevEntry && isCharLikeKind(prevEntry.kind);
+
+      const row = document.createElement("div");
+      row.className = `msg-row ${isChar ? "char" : "user"}${isConsecutive ? " consecutive" : ""}`;
+
+      if (isChar) {
+        row.appendChild(createCharAvatarSlot(isConsecutive));
+      }
+
+      const col = document.createElement("div");
+      col.className = "msg-content-col";
+
+      if (isChar && !isConsecutive) {
+        const nameEl = document.createElement("div");
+        nameEl.className = "msg-sender-name";
+        nameEl.textContent = CHARACTER_CONFIG.name;
+        col.appendChild(nameEl);
+      }
+
+      const bubbleLine = document.createElement("div");
+      bubbleLine.className = "bubble-line";
+
+      if (entry.kind === "photo") {
+        const item = SHORTS_CATALOG[entry.shortsId] || SHORTS_CATALOG.WtDv3Zh5WbM;
+        const card = document.createElement("div");
+        card.className = "photo-card-bubble";
+        card.addEventListener("click", () => openPhotoModal(item.id, entry.caption));
+
+        const imgWrap = document.createElement("div");
+        imgWrap.className = "photo-card-img-wrap";
+        const img = document.createElement("img");
+        img.className = "photo-card-img";
+        img.alt = entry.caption || item.title;
+        applyThumbWithFallback(img, item.thumbnailUrl, item.fallbackThumb, item.title);
+
+        const zoomPill = document.createElement("span");
+        zoomPill.className = "photo-zoom-pill";
+        zoomPill.textContent = "📷 크게 보기";
+
+        imgWrap.append(img, zoomPill);
+
+        const cap = document.createElement("div");
+        cap.className = "photo-card-caption";
+        cap.textContent = entry.caption || item.title;
+
+        card.append(imgWrap, cap);
+        bubbleLine.appendChild(card);
+
+      } else if (entry.kind === "shorts") {
+        /* 9:16 세로형 쇼츠 프리뷰 카드 */
+        const item = SHORTS_CATALOG[entry.shortsId] || SHORTS_CATALOG.WtDv3Zh5WbM;
+        const card = document.createElement("div");
+        card.className = "shorts-card-bubble";
+        card.addEventListener("click", () => openShortsModal(item.id));
+
+        const stage = document.createElement("div");
+        stage.className = "shorts-vertical-stage";
+
+        const img = document.createElement("img");
+        img.className = "shorts-thumb-img";
+        img.alt = item.title;
+        applyThumbWithFallback(img, item.thumbnailUrl, item.fallbackThumb, item.title);
+
+        const overlay = document.createElement("div");
+        overlay.className = "shorts-vertical-overlay";
+        overlay.innerHTML = `
+          <div class="shorts-top-bar">
+            <span class="shorts-badge-top">▶ SHORTS</span>
+            <span class="shorts-ratio-pill">9:16</span>
+          </div>
+          <div class="shorts-center-play">▶</div>
+          <div class="shorts-bottom-meta">
+            <div class="shorts-channel-txt">${item.channel}</div>
+            <div class="shorts-title-txt">${item.title}</div>
+            <div class="shorts-watch-pill">쇼츠 재생하기 ▶</div>
+          </div>
+        `;
+
+        stage.append(img, overlay);
+        card.appendChild(stage);
+        bubbleLine.appendChild(card);
+
+      } else if (entry.kind === "voice") {
+        /* 인터랙티브 보이스 노트 카드 */
+        const item = SHORTS_CATALOG[entry.shortsId] || SHORTS_CATALOG["YG9G-Rl-M6E"];
+        const vBox = document.createElement("div");
+        vBox.className = "voice-bubble";
+
+        const top = document.createElement("div");
+        top.className = "voice-top";
+
+        const playBtn = document.createElement("button");
+        playBtn.type = "button";
+        playBtn.className = "voice-play-btn";
+        playBtn.textContent = "▶";
+        playBtn.setAttribute("aria-label", "보이스노트 재생");
+
+        const wave = document.createElement("div");
+        wave.className = "voice-wave";
+        const barHeights = [36, 72, 50, 92, 64, 86, 46, 95, 70, 56, 82, 42, 64, 38];
+        barHeights.forEach((h) => {
+          const bar = document.createElement("span");
+          bar.className = "voice-bar";
+          bar.style.height = `${h}%`;
+          wave.appendChild(bar);
+        });
+
+        const timerEl = document.createElement("span");
+        timerEl.className = "voice-timer";
+        timerEl.textContent = entry.duration || "0:18";
+
+        let isPlaying = false;
+        let sec = 0;
+        const maxSec = 18;
+        let localInterval = null;
+
+        playBtn.addEventListener("click", () => {
+          if (isPlaying) {
+            isPlaying = false;
+            vBox.classList.remove("playing");
+            playBtn.textContent = "▶";
+            clearInterval(localInterval);
+            return;
+          }
+          SoundFX.voiceChime();
+          isPlaying = true;
+          sec = 0;
+          vBox.classList.add("playing");
+          playBtn.textContent = "❚❚";
+          timerEl.textContent = "0:00";
+
+          localInterval = setInterval(() => {
+            sec++;
+            timerEl.textContent = `0:${String(sec).padStart(2, "0")}`;
+            if (sec >= maxSec) {
+              clearInterval(localInterval);
+              isPlaying = false;
+              vBox.classList.remove("playing");
+              playBtn.textContent = "▶";
+              timerEl.textContent = entry.duration || "0:18";
+            }
+          }, 1000);
+        });
+
+        top.append(playBtn, wave, timerEl);
+
+        const transcript = document.createElement("div");
+        transcript.className = "voice-transcript";
+        transcript.textContent = entry.transcript || "";
+
+        const watchBtn = document.createElement("button");
+        watchBtn.type = "button";
+        watchBtn.className = "voice-watch-link";
+        watchBtn.textContent = "📖 실제 목소리 쇼츠로 듣기 ▶";
+        watchBtn.addEventListener("click", () => openShortsModal(item.id));
+
+        vBox.append(top, transcript, watchBtn);
+        bubbleLine.appendChild(vBox);
+
+      } else {
+        const bubble = document.createElement("div");
+        bubble.className = "bubble";
+        bubble.textContent = entry.text;
+        bubbleLine.appendChild(bubble);
+      }
+
+      // 시간 및 읽음 표시
+      const meta = document.createElement("div");
+      meta.className = "msg-meta";
+      if (!isChar) {
+        const readEl = document.createElement("span");
+        readEl.className = "msg-read-mark";
+        readEl.textContent = "읽음";
+        meta.appendChild(readEl);
+      }
+      const timeEl = document.createElement("span");
+      timeEl.className = "msg-time";
+      timeEl.textContent = entry.time || getFormattedNow();
+      meta.appendChild(timeEl);
+
+      bubbleLine.appendChild(meta);
+      col.appendChild(bubbleLine);
+      row.appendChild(col);
+      DOM.chatMessages.appendChild(row);
+    }
+
+    function showTypingIndicator(prevEntry) {
+      removeTypingIndicator();
+      const isConsecutive = prevEntry && isCharLikeKind(prevEntry.kind);
+      const row = document.createElement("div");
+      row.className = `msg-row char${isConsecutive ? " consecutive" : ""}`;
+      row.id = "typingIndicatorRow";
+
+      row.appendChild(createCharAvatarSlot(isConsecutive));
+
+      const col = document.createElement("div");
+      col.className = "msg-content-col";
+      if (!isConsecutive) {
+        const nameEl = document.createElement("div");
+        nameEl.className = "msg-sender-name";
+        nameEl.textContent = CHARACTER_CONFIG.name;
+        col.appendChild(nameEl);
+      }
+
+      const bubble = document.createElement("div");
+      bubble.className = "typing-bubble";
+      bubble.innerHTML = `<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>`;
+      col.appendChild(bubble);
+      row.appendChild(col);
+
+      DOM.chatMessages.appendChild(row);
+      scrollChatToBottom();
+    }
+
+    function removeTypingIndicator() {
+      const existing = document.getElementById("typingIndicatorRow");
+      if (existing) existing.remove();
+    }
+
+
+    /* ==========================================================================
+       [섹션 12] 조건부 선택지, 에피소드 브릿지 & 멀티 엔딩 카드
+       ========================================================================== */
+    function checkCondition(cond) {
+      if (!cond) return true;
+      if (Array.isArray(cond.any)) {
+        return cond.any.some((sub) => checkCondition(sub));
+      }
+      if (typeof cond.minAffinity === "number" && gameState.affinity < cond.minAffinity) {
+        return false;
+      }
+      if (typeof cond.maxAffinity === "number" && gameState.affinity > cond.maxAffinity) {
+        return false;
+      }
+      if (cond.hasFlag && !gameState.flags[cond.hasFlag]) {
+        return false;
+      }
+      if (cond.notFlag && gameState.flags[cond.notFlag]) {
+        return false;
+      }
+      return true;
+    }
+
+    function renderWaitingBar(text = `${CHARACTER_CONFIG.name}님이 입력 중입니다...`) {
+      DOM.interactionArea.innerHTML = `
+        <div class="waiting-bar">
+          <span>${text}</span>
+          <span class="waiting-bar-send">↑</span>
+        </div>
+      `;
+    }
+
+    function renderChoices(choices) {
+      const available = (choices || []).filter((c) => checkCondition(c.condition));
+      DOM.interactionArea.innerHTML = "";
+
+      if (available.length === 0) {
+        renderWaitingBar("선택 가능한 대화가 없습니다.");
+        return;
+      }
+
+      const head = document.createElement("div");
+      head.className = "choices-header";
+      head.innerHTML = `<span>답장 선택하기</span><span>${available.length}개 선택지</span>`;
+      DOM.interactionArea.appendChild(head);
+
+      const list = document.createElement("div");
+      list.className = "choices-list";
+
+      available.forEach((choice, idx) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        const isSpecial = Boolean(choice.condition);
+        btn.className = `choice-btn${isSpecial ? " is-special" : ""}`;
+        btn.style.animationDelay = `${idx * 65}ms`;
+
+        const textWrap = document.createElement("div");
+        textWrap.className = "choice-text-wrap";
+
+        if (isSpecial) {
+          const tag = document.createElement("span");
+          tag.className = "special-tag";
+          tag.textContent = choice.specialLabel || "✨ 스페셜 선택지";
+          textWrap.appendChild(tag);
+        }
+
+        const label = document.createElement("span");
+        label.textContent = choice.text;
+        textWrap.appendChild(label);
+
+        const arrow = document.createElement("span");
+        arrow.className = "choice-arrow";
+        arrow.textContent = "›";
+
+        btn.append(textWrap, arrow);
+        btn.addEventListener("click", () => handleChoiceSelect(choice));
+        list.appendChild(btn);
+      });
+
+      DOM.interactionArea.appendChild(list);
+      scrollChatToBottom();
+    }
+
+    function renderNextEpisodeCard(nextEp) {
+      const old = DOM.chatMessages.querySelector(".chapter-clear-card");
+      if (old) old.remove();
+
+      if (!gameState.completedEpisodes.includes(gameState.currentEpisodeId)) {
+        gameState.completedEpisodes.push(gameState.currentEpisodeId);
+        saveState();
+      }
+
+      const card = document.createElement("div");
+      card.className = "chapter-clear-card";
+      card.innerHTML = `
+        <div class="chapter-clear-badge">✨ CHAPTER CLEAR</div>
+        <div class="chapter-clear-title">${nextEp.epTitle}</div>
+        <p class="chapter-clear-desc">${nextEp.desc}</p>
+        <div class="chapter-clear-btns">
+          <button type="button" class="btn-secondary js-go-lobby">로비로</button>
+          <button type="button" class="btn-primary js-go-next-ep">${nextEp.nextButtonText}</button>
+        </div>
+      `;
+
+      card.querySelector(".js-go-lobby").addEventListener("click", () => switchView("lobby"));
+      card.querySelector(".js-go-next-ep").addEventListener("click", () => {
+        card.remove();
+        gameState.currentEpisodeId = nextEp.nextEpId;
+        updateChatHeaderStatus(false);
+        playNode(nextEp.nextNodeId);
+      });
+
+      DOM.chatMessages.appendChild(card);
+      renderWaitingBar("다음 에피소드로 이어가거나 로비로 이동할 수 있어요.");
+      scrollChatToBottom();
+    }
+
+    function renderEndingCard(endingId) {
+      const ending = ENDINGS_META[endingId];
+      if (!ending) return;
+
+      const old = DOM.chatMessages.querySelector(".ending-card");
+      if (old) old.remove();
+
+      if (!gameState.completedEpisodes.includes("ep5")) {
+        gameState.completedEpisodes.push("ep5");
+      }
+
+      if (!gameState.unlockedEndings.includes(ending.id)) {
+        gameState.unlockedEndings.push(ending.id);
+        gameState.hasUnreadGallery = true;
+        DOM.galleryUnreadDot.classList.add("visible");
+        SoundFX.unlock();
+        showToast(`💐 엔딩 도감 저장됨: ${ending.title}`);
+      }
+      saveState();
+
+      const shortItem = SHORTS_CATALOG[ending.shortsId] || SHORTS_CATALOG.vPeiPH3hc2Y;
+      const gradeCls = `grade-${ending.grade.toLowerCase()}`;
+
+      const card = document.createElement("div");
+      card.className = `ending-card ${gradeCls}`;
+
+      const visual = document.createElement("div");
+      visual.className = "ending-visual";
+      const img = document.createElement("img");
+      img.alt = ending.title;
+      applyThumbWithFallback(img, shortItem.thumbnailUrl, shortItem.fallbackThumb, ending.title);
+
+      const grad = document.createElement("div");
+      grad.className = "ending-visual-grad";
+      grad.innerHTML = `
+        <span class="ending-rank-badge">${ending.rankLabel}</span>
+        <div class="ending-visual-title">${ending.title}</div>
+      `;
+      visual.append(img, grad);
+
+      const body = document.createElement("div");
+      body.className = "ending-body";
+      body.innerHTML = `
+        <p class="ending-epilogue">${ending.description}</p>
+        <div class="ending-stats">
+          <span class="ending-stat-pill">최종 호감도 ♥ ${gameState.affinity}</span>
+          <span class="ending-stat-pill">쇼츠 앨범 ${gameState.unlockedShorts.length} / ${Object.keys(SHORTS_CATALOG).length}</span>
+          <span class="ending-stat-pill">엔딩 도감 ${gameState.unlockedEndings.length} / ${Object.keys(ENDINGS_META).length}</span>
+        </div>
+        <div class="ending-btn-row">
+          <button type="button" class="btn-secondary js-end-gallery">갤러리 보기</button>
+          <button type="button" class="btn-primary js-end-replay">다른 선택지로 재도전</button>
+        </div>
+      `;
+
+      body.querySelector(".js-end-gallery").addEventListener("click", () => switchView("gallery"));
+      body.querySelector(".js-end-replay").addEventListener("click", () => resetGame(false, true));
+
+      card.append(visual, body);
+      DOM.chatMessages.appendChild(card);
+      renderWaitingBar("변연시 엔딩에 도달했습니다. 갤러리 도감에서 확인해 보세요!");
+      refreshDevModalUI();
+      scrollChatToBottom();
+    }
+
+
+    /* ==========================================================================
+       [섹션 13] 시나리오 실행 코어 엔진
+       ========================================================================== */
+    async function playNode(nodeId) {
+      const node = SCENARIOS[nodeId];
+      if (!node) {
+        showToast(`오류: '${nodeId}' 노드를 찾을 수 없습니다.`);
+        return;
+      }
+
+      const myToken = ++activeRunToken;
+      gameState.currentNodeId = nodeId;
+      if (node.episodeId) gameState.currentEpisodeId = node.episodeId;
+      gameState.nodeCompleted = false;
+      updateChatHeaderStatus(false);
+      saveState();
+      refreshDevModalUI();
+
+      renderWaitingBar(`${CHARACTER_CONFIG.name}님의 메시지를 기다리는 중...`);
+
+      const messages = node.messages || [];
+      for (const msg of messages) {
+        if (myToken !== activeRunToken) return;
+
+        const baseDelay = typeof msg.delay === "number" ? msg.delay : (msg.type === "date" ? 260 : 950);
+        const scaledDelay = Math.max(95, Math.round(baseDelay * gameState.speedMultiplier));
+        const prevEntry = gameState.history[gameState.history.length - 1] || null;
+        const showTyping = ["text", "photo", "shorts", "voice"].includes(msg.type);
+
+        if (showTyping) {
+          updateChatHeaderStatus(true);
+          renderWaitingBar(`${CHARACTER_CONFIG.name}님이 입력 중입니다...`);
+          showTypingIndicator(prevEntry);
+          await sleep(scaledDelay);
+          if (myToken !== activeRunToken) return;
+          removeTypingIndicator();
+          updateChatHeaderStatus(false);
+        } else {
+          await sleep(scaledDelay);
+          if (myToken !== activeRunToken) return;
+        }
+
+        const entry = {
+          kind: msg.type === "text" ? "char" : msg.type,
+          text: msg.text || "",
+          shortsId: msg.shortsId || null,
+          caption: msg.caption || "",
+          duration: msg.duration || "",
+          transcript: msg.transcript || "",
+          time: msg.time || getFormattedNow()
+        };
+
+        gameState.history.push(entry);
+        appendMessageToDOM(entry, prevEntry);
+        if (showTyping) SoundFX.msgIn();
+
+        // 쇼츠 카드가 채팅에 등장하면 즉시 갤러리 쇼츠 앨범 해금!
+        if (msg.shortsId && msg.type === "shorts") {
+          unlockShort(msg.shortsId, false);
+        }
+
+        saveState();
+        scrollChatToBottom();
+
+        await sleep(Math.round(220 * gameState.speedMultiplier));
+      }
+
+      if (myToken !== activeRunToken) return;
+
+      if (node.autoNext) {
+        playNode(node.autoNext);
+        return;
+      }
+
+      gameState.nodeCompleted = true;
+      saveState();
+
+      if (node.endingId) {
+        renderEndingCard(node.endingId);
+      } else if (node.nextEpisode) {
+        renderNextEpisodeCard(node.nextEpisode);
+      } else {
+        renderChoices(node.choices);
+      }
+    }
+
+    async function handleChoiceSelect(choice) {
+      SoundFX.msgOut();
+
+      const prevEntry = gameState.history[gameState.history.length - 1] || null;
+      const userEntry = {
+        kind: "user",
+        text: choice.replyText || choice.text,
+        time: getFormattedNow()
+      };
+      gameState.history.push(userEntry);
+      appendMessageToDOM(userEntry, prevEntry);
+      scrollChatToBottom();
+
+      if (typeof choice.affinity === "number" && choice.affinity !== 0) {
+        changeAffinity(choice.affinity);
+      }
+
+      if (choice.setFlag) {
+        gameState.flags[choice.setFlag] = true;
+      }
+
+      saveState();
+      refreshDevModalUI();
+
+      renderWaitingBar("전송됨...");
+      await sleep(Math.round(420 * gameState.speedMultiplier));
+
+      let targetNode = choice.next;
+      if (choice.routeEnding) {
+        const hasSpringPromise = Boolean(gameState.flags.spring_promise);
+        if (gameState.affinity >= 65 || (gameState.affinity >= 55 && hasSpringPromise)) {
+          targetNode = "ending_happy";
+        } else if (gameState.affinity >= 35) {
+          targetNode = "ending_normal";
+        } else {
+          targetNode = "ending_bad";
+        }
+      }
+
+      if (targetNode) {
+        playNode(targetNode);
+      }
+    }
+
+
+    /* ==========================================================================
+       [섹션 14] 상태 복원, 리셋 & 개발자 도구 제어
+       ========================================================================== */
+    function restoreChatUI() {
+      DOM.chatMessages.innerHTML = "";
+      updateAffinityUI(0);
+      updateChatHeaderStatus(false);
+
+      gameState.history.forEach((entry, i) => {
+        appendMessageToDOM(entry, i > 0 ? gameState.history[i - 1] : null);
+      });
+
+      const curNode = SCENARIOS[gameState.currentNodeId];
+      if (!curNode) {
+        gameState.currentNodeId = "ep1_start";
+        gameState.nodeCompleted = false;
+      }
+
+      if (gameState.history.length > 0 && gameState.nodeCompleted && curNode) {
+        if (curNode.endingId) {
+          renderEndingCard(curNode.endingId);
+        } else if (curNode.nextEpisode) {
+          renderNextEpisodeCard(curNode.nextEpisode);
+        } else {
+          renderChoices(curNode.choices);
+        }
+      } else if (gameState.history.length === 0) {
+        renderWaitingBar("로비에서 에피소드를 선택하거나 시작해 보세요!");
+      }
+    }
+
+    function resetGame(hardReset = false, goToChat = true) {
+      activeRunToken++;
+      removeTypingIndicator();
+
+      const preserved = hardReset
+        ? { speedMultiplier: gameState.speedMultiplier, soundEnabled: gameState.soundEnabled }
+        : {
+            unlockedShorts: gameState.unlockedShorts,
+            unlockedEndings: gameState.unlockedEndings,
+            completedEpisodes: gameState.completedEpisodes,
+            speedMultiplier: gameState.speedMultiplier,
+            soundEnabled: gameState.soundEnabled
+          };
+
+      gameState = createInitialState(preserved);
+      saveState();
+      closeAllModals();
+
+      DOM.chatMessages.innerHTML = "";
+      updateAffinityUI(0);
+      updateChatHeaderStatus(false);
+      renderLobby();
+      renderGallery();
+      refreshDevModalUI();
+
+      showToast(hardReset ? "모든 저장 데이터가 완전히 초기화되었습니다." : "EP.1부터 새로운 이야기가 시작됩니다!");
+
+      if (goToChat) {
+        switchView("chat");
+        playNode("ep1_start");
+      } else {
+        switchView("lobby");
+      }
+    }
+
+    function populateDevNodeSelect() {
+      DOM.devNodeSelect.innerHTML = "";
+      Object.keys(SCENARIOS).forEach((nodeId) => {
+        const node = SCENARIOS[nodeId];
+        const opt = document.createElement("option");
+        opt.value = nodeId;
+        const epPrefix = node.episodeId ? `[${node.episodeId.toUpperCase()}] ` : "";
+        const endSuffix = node.endingId ? " — 엔딩" : "";
+        opt.textContent = `${epPrefix}${nodeId}${endSuffix}`;
+        DOM.devNodeSelect.appendChild(opt);
+      });
+    }
+
+    function refreshDevModalUI() {
+      const epCode = (gameState.currentEpisodeId || "ep1").toUpperCase();
+      DOM.devCurrentNode.textContent = `${epCode} · ${gameState.currentNodeId}`;
+      DOM.devAffinityVal.textContent = String(gameState.affinity);
+      DOM.devAffinitySlider.value = String(gameState.affinity);
+      DOM.devNodeSelect.value = gameState.currentNodeId;
+
+      DOM.btnSpeedNormal.classList.toggle("active", gameState.speedMultiplier === 1);
+      DOM.btnSpeedFast.classList.toggle("active", gameState.speedMultiplier < 1);
+
+      const flags = Object.keys(gameState.flags).filter((k) => gameState.flags[k]);
+      DOM.devFlagsList.innerHTML = "";
+      if (flags.length === 0) {
+        DOM.devFlagsList.innerHTML = `<span class="empty-text">획득한 플래그가 없습니다.</span>`;
+      } else {
+        flags.forEach((f) => {
+          const chip = document.createElement("span");
+          chip.className = "flag-chip";
+          chip.textContent = `#${f}`;
+          DOM.devFlagsList.appendChild(chip);
+        });
+      }
+    }
+
+    function reEvaluateCurrentChoicesIfVisible() {
+      const curNode = SCENARIOS[gameState.currentNodeId];
+      if (gameState.nodeCompleted && curNode && curNode.choices && !curNode.endingId && !curNode.nextEpisode) {
+        renderChoices(curNode.choices);
+      }
+    }
+
+    function closeAllModals() {
+      closeShortsModal();
+      DOM.photoModal.classList.remove("open");
+      DOM.devModal.classList.remove("open");
+      DOM.resetModal.classList.remove("open");
+    }
+
+
+    /* ==========================================================================
+       [섹션 15] 이벤트 바인딩 & 앱 부트스트랩
+       ========================================================================== */
+    function bindEvents() {
+      // 하단 탭 네비게이션
+      DOM.navButtons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const target = btn.dataset.view;
+          if (target === "chat" && gameState.history.length === 0) {
+            switchView("chat");
+            playNode("ep1_start");
+          } else {
+            switchView(target);
+          }
+        });
+      });
+
+      // 로비 주요 버튼
+      DOM.btnLobbyContinue.addEventListener("click", () => {
+        switchView("chat");
+        if (gameState.history.length === 0) {
+          playNode("ep1_start");
+        } else if (!gameState.nodeCompleted) {
+          playNode(gameState.currentNodeId);
+        }
+      });
+
+      DOM.btnLobbyNewGame.addEventListener("click", () => {
+        if (gameState.history.length === 0) {
+          switchView("chat");
+          playNode("ep1_start");
+        } else {
+          DOM.resetModal.classList.add("open");
+        }
+      });
+
+      // 효과음 토글
+      document.querySelectorAll(".js-sound-toggle").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          gameState.soundEnabled = !gameState.soundEnabled;
+          updateSoundButtonsUI();
+          saveState();
+          if (gameState.soundEnabled) SoundFX.msgIn();
+          showToast(gameState.soundEnabled ? "🔊 효과음이 켜졌습니다." : "🔇 효과음이 꺼졌습니다.");
+        });
+      });
+
+      // 개발자 상태창 열기
+      document.querySelectorAll(".js-open-dev").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          refreshDevModalUI();
+          DOM.devModal.classList.add("open");
+        });
+      });
+
+      // 채팅 리셋 버튼
+      document.getElementById("btnChatReset").addEventListener("click", () => {
+        DOM.resetModal.classList.add("open");
+      });
+
+      // 9:16 쇼츠 모달 닫기
+      document.getElementById("btnCloseShortsModal").addEventListener("click", closeShortsModal);
+      DOM.shortsModal.addEventListener("click", (e) => {
+        if (e.target === DOM.shortsModal) closeShortsModal();
+      });
+
+      // 포토 모달 -> 관련 쇼츠 보기
+      DOM.btnPhotoWatchShort.addEventListener("click", () => {
+        DOM.photoModal.classList.remove("open");
+        if (activePhotoShortsId) openShortsModal(activePhotoShortsId);
+      });
+
+      // 공통 모달 닫기
+      document.querySelectorAll("[data-close-modal]").forEach((btn) => {
+        btn.addEventListener("click", closeAllModals);
+      });
+      [DOM.photoModal, DOM.devModal, DOM.resetModal].forEach((backdrop) => {
+        backdrop.addEventListener("click", (e) => {
+          if (e.target === backdrop) closeAllModals();
+        });
+      });
+
+      // ESC 키로 모달 닫기
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeAllModals();
+      });
+
+      // 초기화 확인 버튼
+      document.getElementById("btnConfirmSoftReset").addEventListener("click", () => resetGame(false, true));
+      document.getElementById("btnConfirmHardReset").addEventListener("click", () => resetGame(true, true));
+      document.getElementById("btnDevSoftReset").addEventListener("click", () => resetGame(false, true));
+      document.getElementById("btnDevHardReset").addEventListener("click", () => resetGame(true, false));
+
+      // 개발자 도구: 호감도 조절
+      DOM.devAffinitySlider.addEventListener("input", (e) => {
+        gameState.affinity = Number(e.target.value);
+        updateAffinityUI(0);
+        reEvaluateCurrentChoicesIfVisible();
+        saveState();
+      });
+
+      document.querySelectorAll("[data-affinity-delta]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const delta = Number(btn.dataset.affinityDelta);
+          changeAffinity(delta);
+          reEvaluateCurrentChoicesIfVisible();
+          showToast(`호감도 ${delta > 0 ? "+" : ""}${delta} (현재 ${gameState.affinity})`);
+        });
+      });
+
+      // 개발자 도구: 타이핑 속도 전환
+      DOM.btnSpeedNormal.addEventListener("click", () => {
+        gameState.speedMultiplier = 1;
+        saveState();
+        refreshDevModalUI();
+        showToast("타이핑 속도: 1x 기본");
+      });
+      DOM.btnSpeedFast.addEventListener("click", () => {
+        gameState.speedMultiplier = 0.2;
+        saveState();
+        refreshDevModalUI();
+        showToast("타이핑 속도: 5x 고속 테스트");
+      });
+
+      // 개발자 도구: 선택 노드 점프
+      document.getElementById("btnDevJumpNode").addEventListener("click", () => {
+        const targetNodeId = DOM.devNodeSelect.value;
+        if (!targetNodeId || !SCENARIOS[targetNodeId]) return;
+        closeAllModals();
+        switchView("chat");
+        showToast(`'${targetNodeId}' 노드로 즉시 이동합니다.`);
+        playNode(targetNodeId);
+      });
+
+      // 개발자 도구: 원클릭 퀵 점프 버튼
+      document.querySelectorAll(".js-quick-jump").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const targetNodeId = btn.dataset.jump;
+          if (!targetNodeId || !SCENARIOS[targetNodeId]) return;
+          closeAllModals();
+          switchView("chat");
+          showToast(`'${targetNodeId}' 에피소드로 이동합니다.`);
+          playNode(targetNodeId);
+        });
+      });
+
+      // 개발자 도구: 갤러리 5종 쇼츠 전체 해금
+      document.getElementById("btnDevUnlockGallery").addEventListener("click", () => {
+        Object.keys(SHORTS_CATALOG).forEach((id) => unlockShort(id, true));
+        renderLobby();
+        renderGallery();
+        SoundFX.unlock();
+        showToast("🎞️ 쇼츠 앨범 5종이 모두 해금되었습니다!");
+      });
+    }
+
+    function initApp() {
+      applyThumbWithFallback(
+        DOM.lobbyHeroAvatar,
+        CHARACTER_CONFIG.avatarUrl,
+        CHARACTER_CONFIG.avatarFallbackUrl,
+        CHARACTER_CONFIG.name
+      );
+      applyThumbWithFallback(
+        DOM.chatHeaderAvatar,
+        CHARACTER_CONFIG.avatarUrl,
+        CHARACTER_CONFIG.avatarFallbackUrl,
+        CHARACTER_CONFIG.name
+      );
+      DOM.lobbyCharName.textContent = CHARACTER_CONFIG.name;
+      DOM.lobbyCharStatus.textContent = CHARACTER_CONFIG.statusMessage;
+      DOM.chatCharName.textContent = CHARACTER_CONFIG.name;
+
+      populateDevNodeSelect();
+      bindEvents();
+
+      gameState = loadState();
+      updateSoundButtonsUI();
+      if (gameState.hasUnreadGallery) {
+        DOM.galleryUnreadDot.classList.add("visible");
+      }
+
+      restoreChatUI();
+      renderLobby();
+      renderGallery();
+      refreshDevModalUI();
+
+      const startView = gameState.currentView && DOM.views[gameState.currentView] ? gameState.currentView : "lobby";
+      switchView(startView);
+    }
+
+    window.addEventListener("DOMContentLoaded", initApp);
+  </script>
+</body>
+</html>
